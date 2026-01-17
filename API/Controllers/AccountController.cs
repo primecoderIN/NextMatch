@@ -9,11 +9,12 @@ using System.Text;
 using API.DTOs;
 using System.Threading.Tasks;
 using System;
+using API.Interfaces;
 
 namespace API.Controllers
 {
 
-    public class AccountController(AppDBContext DbContext) : BaseController
+    public class AccountController(AppDBContext DbContext, ITokenService tokenService) : BaseController
     {
         [HttpPost("register")] // localhost:5001/api/account/register
 
@@ -55,7 +56,7 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]  //localhost:5001/api/member/login
-        public async Task<ActionResult<AppUser>> LoginUser([FromBody] LoginDTO loginDTO)
+        public async Task<ActionResult<UserDTO>> LoginUser([FromBody] LoginDTO loginDTO)
         {
             var user = await DbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == loginDTO.Email.ToLower());
 
@@ -76,7 +77,13 @@ namespace API.Controllers
                 }
             }
 
-            return user;
+            return new UserDTO
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = tokenService.CreateToken(user)
+            };
         }
     }
 }
