@@ -6,6 +6,7 @@
 # dotenv files
 .env
 
+<<<<<<< HEAD
 # Environment variables file
 API/appsettings.Development.json
 API/appsettings.Production.json
@@ -14,6 +15,8 @@ API/appsettings.Staging.json
 # DB context files
 API/dating.db
 
+=======
+>>>>>>> 77a5e815298cc9ee95a67ca90af1bbad7d782246
 # User-specific files
 *.rsuser
 *.suo
