@@ -9,6 +9,10 @@ public class AppUser
    public required string UserName {get;set;}
 
    public required string Email {get;set;}
+
+   public required byte[] PasswordHash {get;set;} //byte array to store the hash value of the password
+
+   public required byte[] PasswordSalt {get;set;} //byte array to store the salt value of the password
 }
 
 

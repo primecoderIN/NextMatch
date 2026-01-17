@@ -3,14 +3,14 @@ using API.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using API.Controllers;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]  //localhost:5001/api/members
-    [ApiController]
-    public class MembersController(AppDBContext DbContext): ControllerBase
+
+    public class MembersController(AppDBContext DbContext) : BaseController
     {
-        [HttpGet] 
+        [HttpGet]
         public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers() //Task is used with async await to wait for the task to be completed
         {
             var members = await DbContext.Users.ToListAsync();
@@ -22,7 +22,7 @@ namespace API.Controllers
         {
             var member = await DbContext.Users.FindAsync(Id);
 
-            if(member==null)
+            if (member == null)
             {
                 return NotFound();
             }
