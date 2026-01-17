@@ -1,0 +1,15 @@
+
+
+namespace API.Entities;
+
+public class AppUser
+{
+
+   public  string Id {get;set;} =Guid.NewGuid().ToString(); //For every user a new guid will automatically be created
+   public required string UserName {get;set;}
+
+   public required string Email {get;set;}
+}
+
+
+//Entities are nothing but models
