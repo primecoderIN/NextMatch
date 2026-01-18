@@ -2,8 +2,25 @@ using API.Data;
 using Microsoft.EntityFrameworkCore;
 using API.Services;
 using API.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var TokenKey = builder.Configuration["TokenKey"] ?? throw new Exception("TokenKey not found for jwt configuration");
+        var key = System.Text.Encoding.UTF8.GetBytes(TokenKey);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+
+    });
 
 builder.Services.AddRouting(options =>
 {
@@ -32,6 +49,9 @@ var app = builder.Build();
 
 
 app.UseRouting();
+
+app.UseAuthentication(); //Who are you
+app.UseAuthorization(); //What are you allowed to do
 
 app.MapControllers();
 

@@ -1,14 +1,16 @@
 using API.Data;
 using API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace API.Controllers
 {
-
+     [Authorize] //All endpoints in this controller require authentication unless overridden at method level
     public class MembersController(AppDBContext DbContext) : BaseController
-    {
+    {   
+        // [Authorize] //This is optional here as we have added at class level
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
         {
@@ -20,7 +22,7 @@ namespace API.Controllers
             return Ok(members);
         }
 
-
+        //  [AllowAnonymous] //Overrides the [Authorize] at class level
         [HttpGet("{id}")]  //localhost:5001/api/member/123
         public async Task<ActionResult<AppUser>> GetMemberById([FromRoute] string id)
         {
