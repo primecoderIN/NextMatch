@@ -1,14 +1,10 @@
 using API.Data;
 using API.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using API.Controllers;
 using System.Security.Cryptography;
 using System.Text;
 using API.DTOs;
-using System.Threading.Tasks;
-using System;
 using API.Interfaces;
 
 namespace API.Controllers
@@ -19,7 +15,7 @@ namespace API.Controllers
         [HttpPost("register")] // localhost:5001/api/account/register
 
         //When we mention string the controller will look it into query params by default RegisterUser(string userName,  string email,string password) so not using here
-        public async Task<ActionResult<AppUser>> RegisterUser([FromBody] RegisterDTO registerDTO) //Task is used with async await to wait for the task to be completed
+        public async Task<ActionResult<UserDTO>> RegisterUser([FromBody] RegisterDTO registerDTO) //Task is used with async await to wait for the task to be completed
         {
 
             if (await UserExists(registerDTO.UserName))
@@ -42,7 +38,13 @@ namespace API.Controllers
 
             DbContext.Users.Add(newUser);
             await DbContext.SaveChangesAsync();
-            return newUser;
+            return new UserDTO
+            {
+                Id = newUser.Id,
+                UserName = newUser.UserName,
+                Email = newUser.Email,
+                Token = tokenService.CreateToken(newUser)
+            };
         }
 
         private async Task<bool> UserExists(string userName)

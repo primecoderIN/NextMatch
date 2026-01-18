@@ -1,9 +1,8 @@
 using API.Data;
 using API.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using API.Controllers;
+
 
 namespace API.Controllers
 {
@@ -11,16 +10,25 @@ namespace API.Controllers
     public class MembersController(AppDBContext DbContext) : BaseController
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers() //Task is used with async await to wait for the task to be completed
+        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
         {
-            var members = await DbContext.Users.ToListAsync();
-            return members;
+            //We return 200 status code with data type list always
+            var members = await DbContext.Users
+                .AsNoTracking() //improves performance as we are only reading data no need to track changes
+                .ToListAsync(); //executes the query and returns the result as a list, for no records it returns empty list
+
+            return Ok(members);
         }
 
-        [HttpGet("{Id}")]  //localhost:5001/api/member/123
-        public async Task<ActionResult<AppUser>> GetMemberById([FromRoute] string Id)
+
+        [HttpGet("{id}")]  //localhost:5001/api/member/123
+        public async Task<ActionResult<AppUser>> GetMemberById([FromRoute] string id)
         {
-            var member = await DbContext.Users.FindAsync(Id);
+            var member = await DbContext.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == id); // SingleOrDefaultAsync returns a single element or a default value if no such element is found.
+
+            // You can use FindAsync() OR AsNoTracking() — but never both together.
 
             if (member == null)
             {
@@ -30,3 +38,11 @@ namespace API.Controllers
         }
     }
 }
+
+
+// | Scenario                 | Recommendation   |
+// | ------------------------ | ---------------- |
+// | Simple CRUD app          | `FindAsync()`    |
+// | High traffic / read-only | `AsNoTracking()` |
+// | Followed by update       | `FindAsync()`    |
+// | Microservice API         | `AsNoTracking()` |
