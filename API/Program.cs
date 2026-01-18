@@ -1,57 +1,96 @@
 using API.Data;
-using Microsoft.EntityFrameworkCore;
-using API.Services;
 using API.Interfaces;
+using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/* =======================
+   CORS
+   ======================= */
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins("http://localhost:4200", "https://localhost:4200")
+            .AllowCredentials();
+    });
+});
+
+/* =======================
+   Authentication (JWT)
+   ======================= */
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var TokenKey = builder.Configuration["TokenKey"] ?? throw new Exception("TokenKey not found for jwt configuration");
-        var key = System.Text.Encoding.UTF8.GetBytes(TokenKey);
+        var tokenKey = builder.Configuration["TokenKey"]
+            ?? throw new Exception("TokenKey not found in configuration");
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(tokenKey)
+            ),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
         };
-
     });
 
+/* =======================
+   Authorization
+   ======================= */
+builder.Services.AddAuthorization();
+
+/* =======================
+   Routing
+   ======================= */
 builder.Services.AddRouting(options =>
 {
     options.LowercaseUrls = true;
 });
 
-// Add services to the container.
-builder.Services.AddDbContext<AppDBContext>(opt =>
+/* =======================
+   Database
+   ======================= */
+builder.Services.AddDbContext<AppDBContext>(options =>
 {
-    //opt is same options which we injected in AppDBContext
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    );
 });
 
-
+/* =======================
+   Application Services
+   ======================= */
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-
-
+/* =======================
+   Controllers
+   ======================= */
 builder.Services.AddControllers();
-
 
 var app = builder.Build();
 
-//Add middlewares 
+/* =======================
+   Middleware Pipeline
+   ======================= */
 
-
+app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseAuthentication(); //Who are you
-app.UseAuthorization(); //What are you allowed to do
+app.UseCors("CorsPolicy");
+
+app.UseAuthentication(); // Who are you
+app.UseAuthorization();  // What are you allowed to do
 
 app.MapControllers();
 

@@ -11,6 +11,7 @@ namespace API.Controllers
     public class MembersController(AppDBContext DbContext) : BaseController
     {   
         // [Authorize] //This is optional here as we have added at class level
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
         {
