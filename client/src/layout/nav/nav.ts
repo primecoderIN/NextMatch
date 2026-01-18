@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/services/account-service';
 
@@ -15,14 +15,9 @@ export class Nav {
 
   login ():void {
      this.accountService.login(this.credentials).subscribe({
-      next: response => {
-    
-      },
       error: error => {
-        console.error('There was an error during the login request:', error);
-      },
-      complete: () => {
-        console.log('Login request completed.');
+        console.error('There was an error during the login request:');
+        // You can add more error handling logic here
       }
      })
   }
