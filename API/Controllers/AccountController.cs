@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using API.DTOs;
 using API.Interfaces;
+using API.Extensions; //To use AsUserDTO extension method
 
 namespace API.Controllers
 {
@@ -38,13 +39,7 @@ namespace API.Controllers
 
             DbContext.Users.Add(newUser);
             await DbContext.SaveChangesAsync();
-            return new UserDTO
-            {
-                Id = newUser.Id,
-                UserName = newUser.UserName,
-                Email = newUser.Email,
-                Token = tokenService.CreateToken(newUser)
-            };
+            return newUser.AsUserDTO(tokenService);
         }
 
         private async Task<bool> UserExists(string userName)
@@ -79,13 +74,7 @@ namespace API.Controllers
                 }
             }
 
-            return new UserDTO
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                Token = tokenService.CreateToken(user)
-            };
+            return user.AsUserDTO(tokenService);
         }
     }
 }
