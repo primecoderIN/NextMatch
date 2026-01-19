@@ -3,10 +3,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { Nav } from "../layout/nav/nav";
 import { AccountService } from '../core/services/account-service';
+import { Home } from "../features/home/home";
+import { User } from '../types/user';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav],
+  imports: [Nav, Home],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -14,11 +16,17 @@ export class App implements OnInit {
   private accountService = inject(AccountService);
   private http: HttpClient = inject(HttpClient);
   protected readonly title = signal('client');
-  protected members = signal<any>([]);
+  protected members = signal<User[]>([]);
 
   async ngOnInit() {
     this.setCurrentUser(); // set current user from local storage on app initialization
     this.members.set(await this.getMembers());
+  }
+
+  //A getter to access members signal value
+  //We should not expose signals directly to templates
+  get membersFromApp(): User[] {
+    return this.members();
   }
 
   setCurrentUser = () => {
@@ -31,7 +39,7 @@ export class App implements OnInit {
 
   getMembers = async () => {
     try {
-      return lastValueFrom(this.http.get('https://localhost:5001/api/members'));
+      return lastValueFrom(this.http.get<User[]>('https://localhost:5001/api/members'));
     } catch (error) {
       throw error;
     }
