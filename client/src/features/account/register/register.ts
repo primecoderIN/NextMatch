@@ -10,7 +10,7 @@ import { RegisterCredentials, User } from '../../../types/user';
   standalone: true,
 })
 export class Register {
-//membersFromHome can not be protected as it is used in the template binding
+  //membersFromHome can not be protected as it is used in the template binding
   membersFromHome = input.required<User[]>(); //A signal input to receive data from parent component
   protected regissterFormSignal = signal<RegisterCredentials>({
     userName: '',
@@ -30,8 +30,6 @@ export class Register {
   }
 
   cancel(): void {
-
-    console.log('Registration cancelled');
-    this.cancelRegister.emit(true);
+    this.cancelRegister.emit(false);
   }
 }
