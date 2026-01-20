@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { User } from '../../types/user';
+import { RegisterCredentials, User } from '../../types/user';
 import { tap } from 'rxjs';
 
 @Injectable({
@@ -12,15 +12,29 @@ export class AccountService {
 
   baseUrl = 'https://localhost:5001/api/';
 
+  register(requestBody: RegisterCredentials) {
+    return this.http.post<User>(this.baseUrl + 'account/register', requestBody).pipe(
+      tap((user) => {
+        if (user) {
+          this.setCurrentUser(user);
+        }
+      }),
+    );
+  }
+
   login(requestBody: any) {
     return this.http.post<User>(this.baseUrl + 'account/login', requestBody).pipe(
       tap((user) => {
         if (user) {
-          this.currentUser.set(user); // we can assignb type here "user as User" instead of assigning in post<User>
-          localStorage.setItem('user', JSON.stringify(user));
+          this.setCurrentUser(user);
         }
       }),
     );
+  }
+
+  setCurrentUser(user: User) {
+    this.currentUser.set(user);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   logout() {

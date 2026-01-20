@@ -1,6 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RegisterCredentials, User } from '../../../types/user';
+import { AccountService } from '../../../core/services/account-service';
 
 @Component({
   selector: 'app-register',
@@ -26,10 +27,22 @@ export class Register {
   register(): void {
     // Implement registration logic here, e.g., call a service to register the user
     const data = this.regissterFormSignal();
-    console.log('Registering user with data:', data);
+    this.accountService.register(data).subscribe({
+      next: (user) => {
+        this.cancel();
+        console.log('Registration successful:', user);
+        //Navigate to another page or update UI accordingly
+      },
+      error: (error) => {
+        console.error('Registration failed:', error);
+        //Handle error appropriately, e.g., show error message to user
+      }
+    });
   }
 
   cancel(): void {
     this.cancelRegister.emit(false);
   }
+
+  constructor(private accountService: AccountService) {}
 }
