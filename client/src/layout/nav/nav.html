@@ -1,6 +1,10 @@
 <header class="p-3 w-full fixed top-0 z-50 bg-linear-to-r from-primary to-black">
   <div class="flex align-middle items-center px-10 mx-auto gap-3">
-    <a class="flex items-center gap-2 max-h-16 text-white text-xl mt-0.5 pr-3"
+    <a
+      [routerLinkActiveOptions]="{ exact: true }"
+      routerLinkActive="text-accent"
+      routerLink=""
+      class="flex items-center gap-2 max-h-16 text-white text-xl mt-0.5 pr-3"
       ><svg
         height="20px"
         width="20px"
@@ -65,10 +69,13 @@
       </svg>
     </a>
     <nav class="flex gap-3 my-2 uppercase text-sm text-white select-none cursor-pointer">
-      <a routerLink="" class="hover:text-gray-300">Home</a>
-      <a routerLink="members" class="hover:text-gray-300">Members</a>
-      <a routerLink="lists" class="hover:text-gray-300">Lists</a>
-      <a routerLink="messages" class="hover:text-gray-300">Messages</a>
+      <a routerLinkActive="text-accent" routerLink="/members" class="hover:text-gray-300"
+        >Members</a
+      >
+      <a routerLinkActive="text-accent" routerLink="/lists" class="hover:text-gray-300">Lists</a>
+      <a routerLinkActive="text-accent" routerLink="/messages" class="hover:text-gray-300"
+        >Messages</a
+      >
     </nav>
     <div class="flex ml-auto align-middle gap-3">
       @if (accountService.currentUser(); as user) {
