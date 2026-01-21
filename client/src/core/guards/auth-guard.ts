@@ -7,7 +7,9 @@ export const authGuard: CanActivateFn = () => {
   const accountService = inject(AccountService);
   const toastService = inject(ToastService);
   const router = inject(Router);
-  const user = accountService.currentUser();
+  const user = accountService.isLoggedIn;
+
+  console.log("Auth Guard - isLoggedIn:", user);
   if (user) {
     return true;
   } else {

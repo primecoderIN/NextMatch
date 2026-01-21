@@ -12,13 +12,14 @@ import { Router, RouterOutlet } from '@angular/router';
   styleUrl: './app.css',
 })
 export class App implements OnInit {
-  private accountService = inject(AccountService);
+  // private accountService = inject(AccountService);
   protected router = inject(Router);
  
   // protected members = signal<User[]>([]);
 
   async ngOnInit() {
-    this.setCurrentUserFromLocalStorage(); // set current user from local storage on app initialization
+    // this.setCurrentUserFromLocalStorage(); 
+    // set current user from local storage on app initialization
     // this.members.set(await this.getMembers());
   }
 
@@ -28,13 +29,13 @@ export class App implements OnInit {
   //   return this.members();
   // }
 
-  setCurrentUserFromLocalStorage = () => {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      this.accountService.currentUser.set(user);
-    }
-  };
+  // setCurrentUserFromLocalStorage = () => {
+  //   const userJson = localStorage.getItem('user');
+  //   if (userJson) {
+  //     const user = JSON.parse(userJson);
+  //     this.accountService.currentUser.set(user);
+  //   }
+  // };
 
   // getMembers = async () => {
   //   try {
