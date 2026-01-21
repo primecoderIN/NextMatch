@@ -12,25 +12,52 @@ export const routes: Routes = [
     component: Home,
   },
   {
-    path: 'members',
-    component: MemberList,
+    path: '',
+    runGuardsAndResolvers: 'always',
     canActivate: [authGuard],
+    children: [
+      {
+        path: 'members',
+        component: MemberList,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'members/:id',
+        component: MemberDetail,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'lists',
+        component: Lists,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'messages',
+        component: Messages,
+        canActivate: [authGuard],
+      },
+    ],
   },
-  {
-    path: 'members/:id',
-    component: MemberDetail,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'lists',
-    component: Lists,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'messages',
-    component: Messages,
-    canActivate: [authGuard],
-  },
+  // {
+  //   path: 'members',
+  //   component: MemberList,
+  //   canActivate: [authGuard],
+  // },
+  // {
+  //   path: 'members/:id',
+  //   component: MemberDetail,
+  //   canActivate: [authGuard],
+  // },
+  // {
+  //   path: 'lists',
+  //   component: Lists,
+  //   canActivate: [authGuard],
+  // },
+  // {
+  //   path: 'messages',
+  //   component: Messages,
+  //   canActivate: [authGuard],
+  // },
   {
     path: '**',
     redirectTo: '',

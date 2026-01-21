@@ -41,6 +41,10 @@ export class AccountService {
     this.currentUser.set(null);
     localStorage.removeItem('user');
   }
+
+  get isLoggedIn(): boolean {
+    return this.currentUser() !== null;
+  }
 }
 
 //Pipe doesn not moify the original observable, it just lets you chain one or more operators

@@ -68,15 +68,19 @@
         </g>
       </svg>
     </a>
-    <nav class="flex gap-3 my-2 uppercase text-sm text-white select-none cursor-pointer">
-      <a routerLinkActive="text-accent" routerLink="/members" class="hover:text-gray-300"
-        >Members</a
-      >
-      <a routerLinkActive="text-accent" routerLink="/lists" class="hover:text-gray-300">Lists</a>
-      <a routerLinkActive="text-accent" routerLink="/messages" class="hover:text-gray-300"
-        >Messages</a
-      >
-    </nav>
+    <!-- Navigation Links -->
+    @if (accountService.isLoggedIn) {
+      <nav class="flex gap-3 my-2 uppercase text-sm text-white select-none cursor-pointer">
+        <a routerLinkActive="text-accent" routerLink="/members" class="hover:text-gray-300"
+          >Members</a
+        >
+        <a routerLinkActive="text-accent" routerLink="/lists" class="hover:text-gray-300">Lists</a>
+        <a routerLinkActive="text-accent" routerLink="/messages" class="hover:text-gray-300"
+          >Messages</a
+        >
+      </nav>
+    }
+
     <div class="flex ml-auto align-middle gap-3">
       @if (accountService.currentUser(); as user) {
         <div class="dropdown dropdown-end">
