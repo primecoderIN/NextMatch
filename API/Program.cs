@@ -1,6 +1,7 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using API.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -82,6 +83,8 @@ var app = builder.Build();
 /* =======================
    Middleware Pipeline
    ======================= */
+
+   app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
