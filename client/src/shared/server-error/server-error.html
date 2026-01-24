@@ -1,0 +1,35 @@
+<!-- internal-server-error.component.html -->
+<div class="min-h-[70vh] flex items-center justify-center bg-gray-50 px-6">
+  <div class="w-3/4 text-center bg-white p-8 rounded-xl shadow-lg">
+    <!-- Error Code -->
+    <h1 class="text-7xl font-extrabold text-red-600">{{ error.statusCode }}</h1>
+
+    <!-- Title -->
+    <h2 class="mt-4 text-2xl font-semibold text-gray-800">{{ error.message }}</h2>
+
+    <!-- Message -->
+
+    @if (showDetails) {
+      <div class="mt-3 text-gray-600 w-full">
+        {{ error.details }}
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+      <button
+        (click)="toggleDetails()"
+        class="cursor-pointer select-none px-5 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition"
+      >
+        Show details
+      </button>
+
+      <a
+        routerLink="/"
+        class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition"
+      >
+        Go to Home
+      </a>
+    </div>
+  </div>
+</div>

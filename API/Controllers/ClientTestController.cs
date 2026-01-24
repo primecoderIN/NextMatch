@@ -24,7 +24,7 @@ namespace API.Controllers
         [HttpGet("bad-request")]
         public IActionResult GetBadRequest()
         {
-            return BadRequest();
+            return BadRequest("Bad request!");
         }
 }
 }

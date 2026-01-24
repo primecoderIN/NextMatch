@@ -5,6 +5,9 @@ import { MemberDetail } from '../features/members/member-detail/member-detail';
 import { Lists } from '../features/lists/lists';
 import { Messages } from '../features/messages/messages';
 import { authGuard } from '../core/guards/auth-guard';
+import { TestErrors } from '../features/test-errors/test-errors';
+import { NotFound } from '../shared/not-found/not-found';
+import { ServerError } from '../shared/server-error/server-error';
 
 export const routes: Routes = [
   {
@@ -38,6 +41,10 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'errors',
+    component: TestErrors,
+  },
   // {
   //   path: 'members',
   //   component: MemberList,
@@ -57,10 +64,15 @@ export const routes: Routes = [
   //   path: 'messages',
   //   component: Messages,
   //   canActivate: [authGuard],
-  // },
+  // },,
+  {
+    path: 'server-error',
+    component: ServerError,
+  },
+
   {
     path: '**',
-    redirectTo: '',
+    component: NotFound,
     pathMatch: 'full',
   },
 ];
