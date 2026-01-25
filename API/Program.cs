@@ -50,6 +50,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
    ======================= */
 builder.Services.AddAuthorization();
 
+// 
+
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
 /* =======================
    Routing
    ======================= */
@@ -84,7 +88,7 @@ var app = builder.Build();
    Middleware Pipeline
    ======================= */
 
-   app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
@@ -96,5 +100,20 @@ app.UseAuthentication(); // Who are you
 app.UseAuthorization();  // What are you allowed to do
 
 app.MapControllers();
+
+//Creating scope outside http request pipeline to do migrations
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+try
+{
+    var context = services.GetRequiredService<AppDBContext>();
+    await context.Database.MigrateAsync(); //Asynchronously applies pending migrations
+    await Seed.SeedUsers(context);
+}
+catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occured during migration");
+}
 
 app.Run();

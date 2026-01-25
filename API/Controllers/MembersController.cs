@@ -1,37 +1,30 @@
-using API.Data;
+
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 
 
 namespace API.Controllers
 {
      [Authorize] //All endpoints in this controller require authentication unless overridden at method level
-    public class MembersController(AppDBContext DbContext) : BaseController
+    public class MembersController(IMemberRepository memberRepository) : BaseController
     {   
         // [Authorize] //This is optional here as we have added at class level
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
+        public async Task<ActionResult<IReadOnlyList<Member>>> GetMembers()
         {
-            //We return 200 status code with data type list always
-            var members = await DbContext.Users
-                .AsNoTracking() //improves performance as we are only reading data no need to track changes
-                .ToListAsync(); //executes the query and returns the result as a list, for no records it returns empty list
-
-            return Ok(members);
+           return Ok(await memberRepository.GetMembersAsync()); 
         }
 
-        //  [AllowAnonymous] //Overrides the [Authorize] at class level
-        [HttpGet("{id}")]  //localhost:5001/api/member/123
-        public async Task<ActionResult<AppUser>> GetMemberById([FromRoute] string id)
-        {
-            var member = await DbContext.Users
-            .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == id); // SingleOrDefaultAsync returns a single element or a default value if no such element is found.
 
-            // You can use FindAsync() OR AsNoTracking() — but never both together.
+        // [Authorize]
+        [HttpGet("{id}")]  //localhost:5001/api/member/123
+        public async Task<ActionResult<Member>> GetMemberById([FromRoute] string id)
+        {
+            var member = await memberRepository.GetMemberByIdAsyc(id);
 
             if (member == null)
             {
@@ -39,13 +32,16 @@ namespace API.Controllers
             }
             return member;
         }
+
+        // [Authorize]
+        [HttpGet("{id}/photos")]
+        public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos([FromRoute] string id)
+        {
+            return Ok(await memberRepository.GetPhotoForMemberAsync(id));
+            
+        }
     }
 }
 
 
-// | Scenario                 | Recommendation   |
-// | ------------------------ | ---------------- |
-// | Simple CRUD app          | `FindAsync()`    |
-// | High traffic / read-only | `AsNoTracking()` |
-// | Followed by update       | `FindAsync()`    |
-// | Microservice API         | `AsNoTracking()` |
+

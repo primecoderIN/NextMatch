@@ -1,0 +1,48 @@
+
+
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace API.Entities;
+
+public class Member
+{
+  public string Id {get;set;} = null!; //! operator suppresses nullable reference type warnings
+
+  public DateOnly DateOfBirth {get;set;}
+
+  public string? ImageUrl {get;set;}
+
+  public required string UserName {get;set;}
+
+  public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
+
+  public DateTime LastActive {get;set;} = DateTime.UtcNow;
+
+  public required string Gender {get;set;}
+
+  public string? Description {get;set;}
+
+  public required string City {get;set;}
+
+  public required string Country {get;set;}
+
+
+
+  //Navigation property
+  [JsonIgnore] //Do not send photoes when we return member
+public List<Photo> Photos {get;set;} =[];
+
+
+  [ForeignKey(nameof(Id))]
+  [JsonIgnore]
+  public AppUser User {get;set;} = null!;  
+}
+
+//Responsibility that this model and table will serve
+
+// Public dating profile
+
+// Search, filters, cards, recommendations
+
+// Frequently read data

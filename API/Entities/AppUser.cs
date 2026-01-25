@@ -10,9 +10,14 @@ public class AppUser
 
    public required string Email {get;set;}
 
+   public string? ImageUrl {get;set;}
+
    public required byte[] PasswordHash {get;set;} //byte array to store the hash value of the password
 
    public required byte[] PasswordSalt {get;set;} //byte array to store the salt value of the password
+
+   //Navigation property 
+   public Member Member {get;set;} = null!;
 }
 
 
