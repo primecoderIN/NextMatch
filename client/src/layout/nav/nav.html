@@ -71,8 +71,8 @@
     <!-- Navigation Links -->
     @if (accountService.isLoggedIn) {
       <nav class="flex gap-3 my-2 uppercase text-sm text-white select-none cursor-pointer">
-        <a routerLinkActive="text-accent" routerLink="/members" class="hover:text-gray-300"
-          >Members</a
+        <a routerLinkActive="text-accent"   [routerLinkActiveOptions]="{ exact: true }" routerLink="/members" class="hover:text-gray-300"
+          >Matches</a
         >
         <a routerLinkActive="text-accent" routerLink="/lists" class="hover:text-gray-300">Lists</a>
         <a routerLinkActive="text-accent" routerLink="/messages" class="hover:text-gray-300"
