@@ -5,6 +5,7 @@ import { LoginCredentials } from '../../types/user';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastService } from '../../core/services/toast-service';
 
+
 @Component({
   selector: 'app-nav',
   imports: [FormsModule, RouterLink, RouterLinkActive],

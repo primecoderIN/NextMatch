@@ -1,1 +1,5 @@
-<p>member-list works!</p>
+<div class="flex flex-wrap gap-3 ms-13">
+  @for (member of members$ | async; track member.id) {
+    <app-member-card [member]="member" />
+  }
+</div>

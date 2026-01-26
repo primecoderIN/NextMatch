@@ -78,7 +78,7 @@
         <a routerLinkActive="text-accent" routerLink="/messages" class="hover:text-gray-300"
           >Messages</a
         >
-         <a routerLinkActive="text-accent" routerLink="/errors" class="hover:text-gray-300"
+        <a routerLinkActive="text-accent" routerLink="/errors" class="hover:text-gray-300"
           >Test Error</a
         >
       </nav>
@@ -92,12 +92,16 @@
             role="button"
             class="flex items-center text-white text-xl gap-2 cursor-pointer select-none"
           >
-            <!-- <img src="./user.png" alt="avatar" class="size-6 rounded-box mr-2 text-white" /> -->
-            <div
-              class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold text-lg"
-            >
-              {{ user?.userName?.charAt(0)?.toUpperCase() }}
-            </div>
+            @if (user?.imageUrl) {
+              <img [src]="user?.imageUrl" alt="avatar" class="size-6 rounded-box mr-2 text-white" />
+            } @else {
+              <div
+                class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold text-lg"
+              >
+                {{ user?.userName?.charAt(0)?.toUpperCase() }}
+              </div>
+            }
+
             <span class="mr-2 text-white text-sm">Welcome {{ user?.userName }}</span>
           </div>
           <ul
