@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { MemberService } from '../../../core/services/member-service';
+// import { MemberService } from '../../../core/services/member-service';
 import {
   ActivatedRoute,
   NavigationEnd,
@@ -8,13 +8,13 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
-import { Observable, filter } from 'rxjs';
+
+import { filter } from 'rxjs';
 import { Member } from '../../../types/member';
 
 @Component({
   selector: 'app-member-detail',
-  imports: [AsyncPipe, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './member-detail.html',
   styleUrl: './member-detail.css',
 })
@@ -23,16 +23,15 @@ export class MemberDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   // protected member$!: Observable<Member>;
-  protected member =signal<Member| undefined>(undefined);
+  protected member = signal<Member | undefined>(undefined);
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
 
   ngOnInit(): void {
-    // this.member$ = this.getMemberData(); using route resolver so commented this 
+    // this.member$ = this.getMemberData(); using route resolver so commented this
 
     this.route.data.subscribe({
-      next : data => this.member.set(data["member"])
-    })
-
+      next: (data) => this.member.set(data['member']),
+    });
 
     //Fetch the title of the first child when page opens
     this.title.set(this.route.firstChild?.snapshot.title);

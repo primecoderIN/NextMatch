@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Member } from '../../types/member';
+import { Member, Photo } from '../../types/member';
 import { Observable } from 'rxjs';
 // import { AccountService } from './account-service';
 
@@ -19,6 +19,10 @@ export class MemberService {
 
   getMemberById(id: string): Observable<Member> {
     return this.http.get<Member>(this.baseUrl + `members/${id}`);
+  }
+
+  getMemberPhotos(id: string): Observable<Photo[]> {
+    return this.http.get<Photo[]>(this.baseUrl + `members/${id}` + '/photos');
   }
 
   //This now we are doing using interceptor for each request
