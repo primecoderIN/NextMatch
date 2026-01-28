@@ -8,7 +8,9 @@
       />
       <div class="card-body">
         <div class="flex flex-col items-center">
-          <div class="flex text-2xl text-primary">{{ member.userName }} , {{member.dateOfBirth | age}}</div>
+          <div class="flex text-2xl text-primary">
+            {{ member.userName }} , {{ member.dateOfBirth | age }}
+          </div>
 
           <div class="text-sm">{{ member.city }}, {{ member.country }}</div>
 
@@ -32,8 +34,17 @@
         </div>
       </div>
     </div>
-    <div class="card bg-base=100 w-3/4 p-6">
-      <h3 class="card-title text-3xl text-primary">{{ title() }}</h3>
+    <div class="card bg-base-100 w-3/4 p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="card-title text-3xl text-primary">{{ title() }}</h3>
+
+        @if (isCurrentUser()) {
+          <button class="btn btn-outline btn-secondary" (click)="toggleEditMode()">
+            {{ !memberService.isEditModeEnabled() ? 'Edit' : 'Cancel' }}
+          </button>
+        }
+      </div>
+
       <div class="divider"></div>
       <div><router-outlet></router-outlet></div>
     </div>

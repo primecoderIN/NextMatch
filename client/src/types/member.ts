@@ -18,3 +18,10 @@ export type Photo = {
   publicId?: string | null;
   memberId: string;
 };
+
+export type EditableMember = {
+  userName: string;
+  description?: string;
+  city: string;
+  country: string;
+}

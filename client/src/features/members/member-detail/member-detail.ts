@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 // import { MemberService } from '../../../core/services/member-service';
 import {
   ActivatedRoute,
@@ -12,6 +12,8 @@ import {
 import { filter } from 'rxjs';
 import { Member } from '../../../types/member';
 import { AgePipe } from '../../../core/pipe/age-pipe';
+import { AccountService } from '../../../core/services/account-service';
+import { MemberService } from '../../../core/services/member-service';
 
 @Component({
   selector: 'app-member-detail',
@@ -20,12 +22,18 @@ import { AgePipe } from '../../../core/pipe/age-pipe';
   styleUrl: './member-detail.css',
 })
 export class MemberDetail implements OnInit {
-  // private memberService = inject(MemberService);
+  protected memberService = inject(MemberService);
+  private accountService = inject(AccountService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   // protected member$!: Observable<Member>;
   protected member = signal<Member | undefined>(undefined);
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
+
+
+  protected isCurrentUser = computed(()=> {
+    return this.accountService?.currentUser()?.id===this.route.snapshot.paramMap.get('id');
+  })
 
   ngOnInit(): void {
     // this.member$ = this.getMemberData(); using route resolver so commented this
@@ -42,6 +50,10 @@ export class MemberDetail implements OnInit {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe({
       next: () => this.title.set(this.route.firstChild?.snapshot.title),
     });
+  }
+
+  toggleEditMode(): void {
+    this.memberService.isEditModeEnabled.set(!this.memberService.isEditModeEnabled());
   }
 
   // getMemberData() {
