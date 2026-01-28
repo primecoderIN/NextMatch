@@ -11,7 +11,56 @@
     <h3 class="text-lg font-semibold text-primary">About {{ member.userName }}</h3>
 
     @if (memberService.isEditModeEnabled()) {
-      <h1>Form code goes here</h1>
+      <form
+        #editMemberForm="ngForm"
+        (ngSubmit)="updateMemberProfile()"
+        class="flex flex-col w-full gap-4"
+      >
+        <label class="floating-label mt-3">
+          <span>User name</span>
+          <input
+            type="text"
+            name="userName"
+            [(ngModel)]="memberEditData.userName"
+            class="input w-full"
+            placeholder="User name"
+          />
+        </label>
+
+        <label class="floating-label mt-2">
+          <span>Description</span>
+          <textarea
+            name="description"
+            [(ngModel)]="memberEditData.description"
+            class="textarea w-full"
+            placeholder="Description"
+          ></textarea>
+        </label>
+
+        <label class="floating-label mt-2">
+          <span>City</span>
+          <input
+            name="city"
+            [(ngModel)]="memberEditData.city"
+            class="input w-full"
+            placeholder="City"
+          />
+        </label>
+
+        <label class="floating-label mt-2">
+          <span>Country</span>
+          <input
+            name="country"
+            [(ngModel)]="memberEditData.country"
+            class="input w-full"
+            placeholder="Country"
+          />
+        </label>
+
+        <div class="flex justify-end">
+          <button type="submit" class="btn btn-success mt-4">Save Changes</button>
+        </div>
+      </form>
     } @else {
       <div>{{ member.description }}</div>
     }
