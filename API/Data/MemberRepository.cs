@@ -6,9 +6,14 @@ namespace API.Data;
 
 public class MemberRepository(AppDBContext context) : IMemberRepository
 {
-    public async Task<Member?> GetMemberByIdAsyc(string id)
+    public async Task<Member?> GetMemberByIdAsyc(string id) //Just to get a single member by id
     {
        return await context.Members.FindAsync(id);
+    }
+
+      public async Task<Member?> GetMemberByIdForUpdate(string id) 
+    {
+       return await context.Members.Include(x=> x.User).SingleOrDefaultAsync(x=> x.Id==id);
     }
 
     public async Task<IReadOnlyList<Member>> GetMembersAsync()

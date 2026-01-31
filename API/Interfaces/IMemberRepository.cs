@@ -6,12 +6,13 @@ namespace API.Interfaces;
 public interface IMemberRepository
 {
     void Update(Member member);
- 
-     Task<bool> SaveAllAsync();
 
-     Task<IReadOnlyList<Member>> GetMembersAsync();
+    Task<bool> SaveAllAsync();
 
-     Task<Member?> GetMemberByIdAsyc(string id);
+    Task<IReadOnlyList<Member>> GetMembersAsync();
 
-     Task<IReadOnlyList<Photo>> GetPhotoForMemberAsync(string memberId);
+    Task<Member?> GetMemberByIdAsyc(string id);
+    Task<Member?> GetMemberByIdForUpdate(string id);
+
+    Task<IReadOnlyList<Photo>> GetPhotoForMemberAsync(string memberId);
 }

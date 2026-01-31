@@ -4,7 +4,7 @@ using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using API.DTOs;
-using System.Security.Claims;
+using API.Extensions;
 
 
 
@@ -47,10 +47,12 @@ namespace API.Controllers
         [HttpPut]  //localhost:5001/api/member
         public async Task<ActionResult> UpdateMember([FromBody] MemberUpdateDTO memberUpdateDTO)
         {
-            var memberId = User.FindFirstValue(ClaimTypes.NameIdentifier); //“Give me the logged-in user’s unique ID from the JWT token.”
+            // var memberId = User.FindFirstValue(ClaimTypes.NameIdentifier); //“Give me the logged-in user’s unique ID from the JWT token.”
 
-            if (memberId == null) return BadRequest("Invalid member id");
-            var member = await memberRepository.GetMemberByIdAsyc(memberId);
+            var memberId = User.GetMemberId();
+            if (memberId == null) return Unauthorized();
+
+            var member = await memberRepository.GetMemberByIdForUpdate(memberId);
 
             if (member == null) return NotFound();
 
@@ -58,6 +60,8 @@ namespace API.Controllers
             member.Description = memberUpdateDTO.Description ?? member.Description;
             member.City = memberUpdateDTO.City ?? member.City;
             member.Country = memberUpdateDTO.Country ?? member.Country;
+
+            member.User.UserName = memberUpdateDTO.UserName ?? member.User.UserName; //Sync the username in AppUser entity
 
             memberRepository.Update(member); //Marks the entity as modified in the context
             if (await memberRepository.SaveAllAsync())
