@@ -1,10 +1,10 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EditableMember, Member } from '../../../types/member';
 import { DatePipe } from '@angular/common';
 import { MemberService } from '../../../core/services/member-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-member-profile',
@@ -13,7 +13,14 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './member-profile.css',
 })
 export class MemberProfile implements OnInit, OnDestroy {
-  @ViewChild('memberEditForm') memberEditForm: any;
+  @ViewChild('editMemberForm') memberEditForm!: NgForm ;
+  @HostListener('window:beforeunload', ['$event']) unloadNotification($event: BeforeUnloadEvent) {
+    //this will trigger when user tries to close the tab or browser window
+    //for in page navigation, we use canDeactivate guard
+    if (this.memberEditForm?.dirty) {
+      $event.preventDefault();
+    }
+  };
   protected memberService = inject(MemberService);
   private route = inject(ActivatedRoute);
   protected member = signal<Member | undefined>(undefined);
