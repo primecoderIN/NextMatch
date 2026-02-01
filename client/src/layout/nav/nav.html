@@ -88,6 +88,10 @@
       </nav>
     }
 
+    @if(busyService.busyRequestCount()>0) {
+     <span class="loading loading-spinner text-accent"></span>
+    }
+
     <div class="flex ml-auto align-middle gap-3">
       @if (accountService.currentUser(); as user) {
         <div class="dropdown dropdown-end">
