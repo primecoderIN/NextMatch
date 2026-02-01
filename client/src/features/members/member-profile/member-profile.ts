@@ -5,16 +5,15 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  signal,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { EditableMember, Member } from '../../../types/member';
 import { DatePipe } from '@angular/common';
 import { MemberService } from '../../../core/services/member-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastService } from '../../../core/services/toast-service';
+import { AccountService } from '../../../core/services/account-service';
 
 @Component({
   selector: 'app-member-profile',
@@ -31,10 +30,9 @@ export class MemberProfile implements OnInit, OnDestroy {
       $event.preventDefault();
     }
   }
+  protected accountService = inject(AccountService);
   protected toast = inject(ToastService);
   protected memberService = inject(MemberService);
-  private route = inject(ActivatedRoute);
-  protected member = signal<Member | undefined>(undefined);
   private destroyRef = inject(DestroyRef);
   protected memberEditData: EditableMember = {
     userName: '',
@@ -43,12 +41,12 @@ export class MemberProfile implements OnInit, OnDestroy {
     country: '',
   };
 
-  ngOnInit(): void {
-    this.route.parent?.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (data) => this.member.set(data['member']),
-    });
+  
 
-    const member = this.member();
+  ngOnInit(): void {
+    const member = this.memberService.member();
+
+    console.log("memmber in profile:", member);
 
     this.memberEditData = {
       userName: member?.userName || '',
@@ -68,7 +66,7 @@ export class MemberProfile implements OnInit, OnDestroy {
     if (!this.memberEditData) return;
 
     const updatedMember = {
-      ...this.member(),
+      ...this.memberService.member(),
       ...this.memberEditData,
     } as Member;
     // this.member.set(updatedMember);
@@ -79,9 +77,23 @@ export class MemberProfile implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.toast.success('Profile updated successfully');
-          this.member.set(updatedMember);
           this.memberEditForm?.reset(updatedMember); //Reset form state after successful update
+          this.memberService.member.set(updatedMember); //Update the member signal with new data
           this.memberService.isEditModeEnabled.set(false);
+
+          //Update user info in local storage also and account service also
+
+          const currentUser = this.accountService.currentUser();
+          if (currentUser) {
+            const updatedUser = {
+              ...currentUser,
+              city: updatedMember.city,
+              country: updatedMember.country,
+              description: updatedMember.description,
+              userName: updatedMember.userName,
+            };
+            this.accountService.setCurrentUser(updatedUser);
+          }
         },
       });
   }

@@ -27,7 +27,6 @@ export class MemberDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   // protected member$!: Observable<Member>;
-  protected member = signal<Member | undefined>(undefined);
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
 
 
@@ -38,9 +37,6 @@ export class MemberDetail implements OnInit {
   ngOnInit(): void {
     // this.member$ = this.getMemberData(); using route resolver so commented this
 
-    this.route.data.subscribe({
-      next: (data) => this.member.set(data['member']),
-    });
 
     //Fetch the title of the first child when page opens
     this.title.set(this.route.firstChild?.snapshot.title);

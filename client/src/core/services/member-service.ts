@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { EditableMember, Member, Photo } from '../../types/member';
-import { Observable } from 'rxjs';
-import id from '@angular/common/locales/extra/id';
+import { Observable, tap } from 'rxjs';
 // import { AccountService } from './account-service';
 
 @Injectable({
@@ -13,6 +12,7 @@ export class MemberService {
   private http = inject(HttpClient);
   // private accountService = inject(AccountService);
   private baseUrl = environment.apiUrl;
+   member = signal<Member | null>(null);
   isEditModeEnabled = signal<boolean>(false);
 
   getMembers(): Observable<Member[]> {
@@ -20,7 +20,11 @@ export class MemberService {
   }
 
   getMemberById(id: string): Observable<Member> {
-    return this.http.get<Member>(this.baseUrl + `members/${id}`);
+    return this.http.get<Member>(this.baseUrl + `members/${id}`).pipe(
+      tap(member=> {
+        this.member.set({...member});
+      })
+    );
   }
 
   getMemberPhotos(id: string): Observable<Photo[]> {
