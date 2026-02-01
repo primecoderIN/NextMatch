@@ -58,7 +58,7 @@
         </label>
 
         <div class="flex justify-end">
-          <button type="submit" class="btn btn-success mt-4">Save Changes</button>
+          <button [disabled]="!editMemberForm.dirty" type="submit" class="btn btn-success mt-4">Save Changes</button>
         </div>
       </form>
     } @else {
