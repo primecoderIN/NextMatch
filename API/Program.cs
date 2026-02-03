@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,11 @@ builder.Services.AddAuthorization();
 
 // 
 
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); //Key should be same as app settings
 
 /* =======================
    Routing
