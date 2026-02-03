@@ -8,10 +8,11 @@ using API.Extensions;
 
 
 
+
 namespace API.Controllers
 {
     [Authorize] //All endpoints in this controller require authentication unless overridden at method level
-    public class MembersController(IMemberRepository memberRepository) : BaseController
+    public class MembersController(IMemberRepository memberRepository, IPhotoService photoService) : BaseController
     {
         // [Authorize] //This is optional here as we have added at class level
         // [AllowAnonymous]
@@ -71,8 +72,50 @@ namespace API.Controllers
 
             return BadRequest("Failed to update member");
         }
-    }
 
+
+        [HttpPost("upload-photo")]
+        public async Task<ActionResult<Photo>> UploadProfilePicture([FromForm] IFormFile file)
+        {
+            var memberId = User.GetMemberId();
+            if (memberId == null) return Unauthorized();
+
+            var member = await memberRepository.GetMemberByIdForUpdate(memberId);
+            if (member == null) return NotFound();
+
+            var result = await photoService.UploadPhotoAsync(file);
+
+            if (result.Error != null)
+            {
+                return BadRequest(result.Error.Message);
+            }
+
+            var photo = new Photo()
+            {
+                Url = result.SecureUrl.AbsoluteUri,
+                PublicId = result.PublicId,
+                MemberId = memberId
+            };
+
+            if (member.ImageUrl == null)
+            {
+                member.ImageUrl = photo.Url;
+                member.User.ImageUrl = photo.Url;
+            }
+
+            member.Photos.Add(photo);
+
+            if (await memberRepository.SaveAllAsync())
+            {
+                return photo;
+            }
+
+
+            return BadRequest("Problem saving photo");
+        }
+
+
+    }
 
 }
 
