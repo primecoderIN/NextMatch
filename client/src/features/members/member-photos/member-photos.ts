@@ -1,26 +1,46 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MemberService } from '../../../core/services/member-service';
 import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../../types/member';
-import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { ImageUpload } from '../../../shared/image-upload/image-upload';
 
 @Component({
   selector: 'app-member-photos',
-  imports: [AsyncPipe],
+  imports: [ImageUpload],
   templateUrl: './member-photos.html',
   styleUrl: './member-photos.css',
 })
 export class MemberPhotos implements OnInit {
-  private memberService = inject(MemberService);
+  protected memberService = inject(MemberService);
   private route = inject(ActivatedRoute);
-  protected photo$?: Observable<Photo[]>;
+  protected photos = signal<Photo[]>([]);
+  protected isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     const memberId = this.route.parent?.snapshot.paramMap.get('id');
 
     if (memberId) {
-      this.photo$ = this.memberService.getMemberPhotos(memberId);
+      this.memberService.getMemberPhotos(memberId).subscribe({
+        next: (photos) => {
+          this.photos.set(photos);
+        },
+      });
     }
   }
+
+  onImageUpload(file: File): void {
+    this.isLoading.set(true);
+    this.memberService.uploadPhoto(file).subscribe({
+      next: (photo) => {
+        this.photos.update((currentPhotos) => [...currentPhotos, photo]);
+        this.isLoading.set(false);
+        this.memberService.isEditModeEnabled.set(false);
+      },
+      error: ()=> {
+        this.isLoading.set(false);
+        console.log('Error uploading photo');
+      }
+    });
+  }
+
 }

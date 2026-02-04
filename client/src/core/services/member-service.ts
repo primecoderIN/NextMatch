@@ -35,6 +35,12 @@ export class MemberService {
     return this.http.put<void>(this.baseUrl + `members`, member);
   }
 
+  uploadPhoto(file: File): Observable<Photo> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<Photo>(this.baseUrl + 'members/upload-photo', formData);
+  }
+
   //This now we are doing using interceptor for each request
   // private getHttpOptions() {
   //   return {
