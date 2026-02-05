@@ -139,6 +139,36 @@ namespace API.Controllers
             return BadRequest("Failed to set default photo");
 
         }
+
+        [HttpDelete("delete-photo/{photoId}")]  //localhost:5001/api/member/delete-photo?photoId=123
+        public async Task<ActionResult> DeletePhoto(int photoId)
+        {
+            var memberId = User.GetMemberId();
+            if (memberId == null) return Unauthorized();
+
+            var member = await memberRepository.GetMemberByIdForUpdate(memberId);
+            if (member == null) return NotFound();
+
+            var photo = member.Photos.SingleOrDefault(p => p.Id == photoId);
+    
+
+            if (member.ImageUrl == photo?.Url || photo == null) return BadRequest();
+
+            if (photo.PublicId != null)
+            {
+                var result = await photoService.DeletePhotoAsync(photo.PublicId);
+                if (result.Error != null) return BadRequest(result.Error.Message);
+            }
+
+            member.Photos.Remove(photo);
+
+            if (await memberRepository.SaveAllAsync())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Failed to delete photo");
+        }
     }
 
 }

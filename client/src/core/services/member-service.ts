@@ -45,6 +45,10 @@ export class MemberService {
     return this.http.put<void>(this.baseUrl + `members/set-default-photo/${photo.id}`,{});
   }
 
+  deletePhoto(photo:Photo) {
+    return this.http.delete<void>(this.baseUrl + `members/delete-photo/${photo.id}`);
+  }
+
   //This now we are doing using interceptor for each request
   // private getHttpOptions() {
   //   return {

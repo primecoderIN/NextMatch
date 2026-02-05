@@ -63,4 +63,14 @@ export class MemberPhotos implements OnInit {
       },
     });
   }
+
+  detelePhoto(photo: Photo): void {
+    this.memberService.deletePhoto(photo).subscribe({
+      next: () => {
+        this.photos.update((currentPhotos) =>
+          currentPhotos.filter((p) => p.id !== photo.id)
+        );
+      },
+    }); 
+  }
 }
