@@ -115,6 +115,30 @@ namespace API.Controllers
         }
 
 
+        [HttpPut("set-default-photo/{photoId}")]  //localhost:5001/api/member/set-default-photo?photoId=123
+
+        public async Task<ActionResult> SetDefaultPhoto(int photoId)
+        {
+            var memberId = User.GetMemberId();
+            if (memberId == null) return Unauthorized();
+
+            var member = await memberRepository.GetMemberByIdForUpdate(memberId);
+            if (member == null) return NotFound();
+
+            var photo = member.Photos.SingleOrDefault(p => p.Id == photoId);
+            if (photo == null || member.ImageUrl == photo.Url) return BadRequest();
+
+            member.ImageUrl = photo.Url;
+            member.User.ImageUrl = photo.Url;
+
+            if (await memberRepository.SaveAllAsync())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Failed to set default photo");
+
+        }
     }
 
 }

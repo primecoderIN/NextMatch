@@ -3,6 +3,8 @@ import { MemberService } from '../../../core/services/member-service';
 import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../../types/member';
 import { ImageUpload } from '../../../shared/image-upload/image-upload';
+import { AccountService } from '../../../core/services/account-service';
+import { User } from '../../../types/user';
 
 @Component({
   selector: 'app-member-photos',
@@ -12,6 +14,7 @@ import { ImageUpload } from '../../../shared/image-upload/image-upload';
 })
 export class MemberPhotos implements OnInit {
   protected memberService = inject(MemberService);
+  protected accountService = inject(AccountService);
   private route = inject(ActivatedRoute);
   protected photos = signal<Photo[]>([]);
   protected isLoading = signal<boolean>(false);
@@ -36,11 +39,28 @@ export class MemberPhotos implements OnInit {
         this.isLoading.set(false);
         this.memberService.isEditModeEnabled.set(false);
       },
-      error: ()=> {
+      error: () => {
         this.isLoading.set(false);
         console.log('Error uploading photo');
-      }
+      },
     });
   }
 
+  setMainPhoto(photo: Photo): void {
+    this.memberService.setMainPhoto(photo).subscribe({
+      next: () => {
+        const currentUser = this.accountService.currentUser();
+        if (currentUser) {
+          currentUser.imageUrl = photo.url;
+          this.accountService.setCurrentUser(currentUser as User);
+          this.memberService.member.update((member) => {
+            if (member) {
+              return { ...member, imageUrl: photo.url };
+            }
+            return member;
+          });
+        }
+      },
+    });
+  }
 }

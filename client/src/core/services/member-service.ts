@@ -41,6 +41,10 @@ export class MemberService {
     return this.http.post<Photo>(this.baseUrl + 'members/upload-photo', formData);
   }
 
+  setMainPhoto(photo: Photo) {
+    return this.http.put<void>(this.baseUrl + `members/set-default-photo/${photo.id}`,{});
+  }
+
   //This now we are doing using interceptor for each request
   // private getHttpOptions() {
   //   return {
