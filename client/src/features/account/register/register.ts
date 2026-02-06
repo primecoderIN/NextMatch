@@ -1,33 +1,37 @@
-import { Component, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, input, OnInit, output, signal } from '@angular/core';
+import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterCredentials, User } from '../../../types/user';
 import { AccountService } from '../../../core/services/account-service';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
   standalone: true,
 })
-export class Register {
+export class Register implements OnInit {
   //membersFromHome can not be protected as it is used in the template binding
   membersFromHome = input.required<User[]>(); //A signal input to receive data from parent component
-  protected regissterFormSignal = signal<RegisterCredentials>({
-    userName: '',
-    password: '',
-    email: '',
-  });
   cancelRegister = output<boolean>(); //Pass data from register to parent component, this can not be protected as it is used in the template binding
 
-  get registerFormData(): RegisterCredentials {
-    return this.regissterFormSignal();
+  protected registerForm: FormGroup = new FormGroup({});
+
+  get isValidForm(): boolean {
+    return this.registerForm.valid;
+  }
+
+  ngOnInit(): void {
+    this.registerForm = new FormGroup({
+      userName: new FormControl('', Validators.required),
+      password: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+    });
   }
 
   register(): void {
-    // Implement registration logic here, e.g., call a service to register the user
-    const data = this.regissterFormSignal();
-    this.accountService.register(data).subscribe({
+    const formData = this.registerForm.value;
+    this.accountService.register(formData).subscribe({
       next: (user) => {
         this.cancel();
         console.log('Registration successful:', user);
@@ -36,7 +40,7 @@ export class Register {
       error: (error) => {
         console.error('Registration failed:', error);
         //Handle error appropriately, e.g., show error message to user
-      }
+      },
     });
   }
 
