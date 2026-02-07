@@ -2,16 +2,132 @@
   <div class="card-title justify-center text-3xl text-primary">Sign up</div>
   <div class="card-body w-full">
     <form [formGroup]="registerForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
-      <input formControlName="userName" placeholder="Username" class="input w-full" />
-      <input formControlName="email" type="email" placeholder="Email" class="input w-full" />
-      <input
-        type="password"
-        formControlName="password"
-        placeholder="Password"
-        class="input w-full"
-      />
+      <label class="input w-full" [class.input-error]="isInvalidValue('userName')">
+        <input formControlName="userName" placeholder="Username" />
+        <div class="tooltip">
+          <div class="tooltip-content">
+            @if (getFormControlErrorInfo('userName'); as errorInfo) {
+              @for (error of errorInfo; track $index) {
+                <p>{{ error }}</p>
+              }
+            }
+          </div>
+          @if (isInvalidValue('userName')) {
+            <button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                />
+              </svg>
+            </button>
+          }
+        </div>
+      </label>
+
+      <label class="input w-full" [class.input-error]="isInvalidValue('email')">
+        <input formControlName="email" type="email" placeholder="Email" />
+        <div class="tooltip">
+          <div class="tooltip-content">
+            @if (getFormControlErrorInfo('email'); as errorInfo) {
+              @for (error of errorInfo; track $index) {
+                <p>{{ error }}</p>
+              }
+            }
+          </div>
+          @if (isInvalidValue('email')) {
+            <button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                />
+              </svg>
+            </button>
+          }
+        </div>
+      </label>
+
+      <label class="input w-full" [class.input-error]="isInvalidValue('password')">
+        <input formControlName="password" type="password" placeholder="Password" />
+        <div class="tooltip">
+          <div class="tooltip-content">
+            @if (getFormControlErrorInfo('password'); as errorInfo) {
+              @for (error of errorInfo; track $index) {
+                <p>{{ error }}</p>
+              }
+            }
+          </div>
+          @if (isInvalidValue('password')) {
+            <button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                />
+              </svg>
+            </button>
+          }
+        </div>
+      </label>
+
+      <label class="input w-full" [class.input-error]="isInvalidValue('confirmPassword')">
+        <input formControlName="confirmPassword" type="password" placeholder="Confirm Password" />
+        <div class="tooltip">
+          <div class="tooltip-content">
+            @if (getFormControlErrorInfo('confirmPassword'); as errorInfo) {
+              @for (error of errorInfo; track $index) {
+                <p>{{ error }}</p>
+              }
+            }
+          </div>
+          @if (isInvalidValue('confirmPassword')) {
+            <button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                />
+              </svg>
+            </button>
+          }
+        </div>
+      </label>
+
       <div class="flex items-center justify-between">
-        <button  type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
+        <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
         <button [disabled]="!isValidForm" type="submit" class="btn btn-primary">Register</button>
       </div>
     </form>

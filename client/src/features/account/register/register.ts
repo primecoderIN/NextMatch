@@ -1,5 +1,13 @@
 import { Component, input, OnInit, output, signal } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  ValidatorFn,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { RegisterCredentials, User } from '../../../types/user';
 import { AccountService } from '../../../core/services/account-service';
 
@@ -21,16 +29,60 @@ export class Register implements OnInit {
     return this.registerForm.valid;
   }
 
+  isInvalidValue(controlName: string): boolean {
+    const control = this.registerForm.get(controlName) as FormControl;
+    return control?.invalid && control?.touched;
+  }
+
+  getFormControlErrorInfo(controlName: string): string[] {
+    const control = this.registerForm.get(controlName);
+    if (!control || !control.errors) return [];
+
+    const errors = control.errors;
+    const messages: string[] = [];
+
+    if (errors['required']) {
+      messages.push(`${controlName} is required`);
+    }
+
+    if (errors['minlength']) {
+      messages.push(`Minimum ${errors['minlength'].requiredLength} characters required`);
+    }
+
+    if (errors['maxlength']) {
+      messages.push(`Maximum ${errors['maxlength'].requiredLength} characters allowed`);
+    }
+
+    return messages;
+  }
+
   ngOnInit(): void {
     this.registerForm = new FormGroup({
       userName: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required),
+      password: new FormControl('', [Validators.required, Validators.minLength(4)]),
+      confirmPassword: new FormControl('', [Validators.required, this.matchValues('password')]),
       email: new FormControl('', [Validators.required, Validators.email]),
+    });
+
+    // Update confirmPassword validity whenever password changes
+    this.registerForm.controls['password'].valueChanges.subscribe(() => {
+      this.registerForm.controls['confirmPassword'].updateValueAndValidity();
     });
   }
 
+  matchValues(matchTo: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const parent = control.parent as FormGroup;
+      if (!parent) return null;
+      const controlToMatch = parent.get(matchTo);
+      if (!controlToMatch) return null;
+      return control.value === controlToMatch.value ? null : { passwordMismatch: true };
+    };
+  }
+
   register(): void {
-    const formData = this.registerForm.value;
+    const { userName, email, password } = this.registerForm.value;
+    const formData: RegisterCredentials = { userName, email, password };
     this.accountService.register(formData).subscribe({
       next: (user) => {
         this.cancel();
