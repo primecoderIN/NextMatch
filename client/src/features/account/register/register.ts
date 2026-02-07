@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -7,8 +7,9 @@ import {
   ValidatorFn,
   AbstractControl,
   ValidationErrors,
+  FormBuilder,
 } from '@angular/forms';
-import { RegisterCredentials, User } from '../../../types/user';
+import { User } from '../../../types/user';
 import { AccountService } from '../../../core/services/account-service';
 import { TextInput } from '../../../shared/text-input/text-input';
 
@@ -19,19 +20,26 @@ import { TextInput } from '../../../shared/text-input/text-input';
   styleUrl: './register.css',
   standalone: true,
 })
-export class Register implements OnInit {
+export class Register {
   //membersFromHome can not be protected as it is used in the template binding
   membersFromHome = input.required<User[]>(); //A signal input to receive data from parent component
   cancelRegister = output<boolean>(); //Pass data from register to parent component, this can not be protected as it is used in the template binding
+  private fb = inject(FormBuilder); //FormBuilder instance to create form controls and groups
+  protected credentialsForm: FormGroup;
+  protected profileForm: FormGroup;
+  private accountService = inject(AccountService); //AccountService instance to handle registration logic
+  protected currentStep = signal(1); //Track the current step in the multi-step form
 
-  protected registerForm: FormGroup = new FormGroup({});
-
-  get isValidForm(): boolean {
-    return this.registerForm.valid;
+  get isValidCredentialsForm(): boolean {
+    return this.credentialsForm.valid;
   }
 
-  ngOnInit(): void {
-    this.registerForm = new FormGroup({
+  get isValidProfileForm() {
+    return this.profileForm.valid;
+  }
+
+  constructor() {
+    this.credentialsForm = this.fb.group({
       userName: new FormControl('', Validators.required),
       password: new FormControl('', [Validators.required, Validators.minLength(4)]),
       confirmPassword: new FormControl('', [
@@ -42,9 +50,16 @@ export class Register implements OnInit {
       email: new FormControl('', [Validators.required, Validators.email]),
     });
 
+    this.profileForm = this.fb.group({
+      gender: new FormControl('', Validators.required),
+      dateOfBirth: new FormControl('', Validators.required),
+      city: new FormControl('', Validators.required),
+      country: new FormControl('', Validators.required),
+    });
+
     // Update confirmPassword validity whenever password changes
-    this.registerForm.controls['password'].valueChanges.subscribe(() => {
-      this.registerForm.controls['confirmPassword'].updateValueAndValidity();
+    this.credentialsForm.controls['password'].valueChanges.subscribe(() => {
+      this.credentialsForm.controls['confirmPassword'].updateValueAndValidity();
     });
   }
 
@@ -58,9 +73,25 @@ export class Register implements OnInit {
     };
   }
 
+  nextStep(): void {
+    if (this.currentStep() === 1 && this.credentialsForm.valid) {
+      this.currentStep.update((step) => step + 1);
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep() > 1) {
+      this.currentStep.update((step) => step - 1);
+    }
+  }
+
   register(): void {
-    const { userName, email, password } = this.registerForm.value;
-    const formData: RegisterCredentials = { userName, email, password };
+    if (!this.credentialsForm.valid || !this.profileForm.valid) {
+      return; //Form is not valid, do not proceed with registration
+    }
+    const { userName, email, password } = this.credentialsForm.value;
+    const profileData = this.profileForm.value;
+    const formData = { userName, email, password, ...profileData };
     this.accountService.register(formData).subscribe({
       next: (user) => {
         this.cancel();
@@ -77,6 +108,4 @@ export class Register implements OnInit {
   cancel(): void {
     this.cancelRegister.emit(false);
   }
-
-  constructor(private accountService: AccountService) {}
 }

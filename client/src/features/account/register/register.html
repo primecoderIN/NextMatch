@@ -1,34 +1,85 @@
 <div class="card bg-base-100 w-1/2 mx-auto flex flex-col p-6 rounded-lg shadow-lg select-none">
   <div class="card-title justify-center text-3xl text-primary">Sign up</div>
+  <p class="text-center text-sm text-gray-500 mb-4">
+    Create your account by filling in the information below.
+  </p>
   <div class="card-body w-full">
-    <form [formGroup]="registerForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
-      <app-text-input
-        formControlName="userName"
-        type="text"
-        placeholder="Username"
-        label="Username"
-      />
+    <ul class="steps steps-horizontal">
+      <li class="step step-primary">Enter credentials</li>
+      <li class="step" [class.step-primary]="currentStep() === 2">Enter profile info</li>
+    </ul>
 
-      <app-text-input formControlName="email" type="email" placeholder="Email" label="Email" />
+    @if (currentStep() === 1) {
+      <form [formGroup]="credentialsForm" class="flex flex-col gap-4 w-full">
 
-      <app-text-input
-        formControlName="password"
-        type="password"
-        placeholder="Password"
-        label="Password"
-      />
+        <app-text-input
+          formControlName="userName"
+          type="text"
+          placeholder="Username"
+          label="Username"
+        />
 
-      <app-text-input
-        formControlName="confirmPassword"
-        type="password"
-        placeholder="Confirm Password"
-        label="Confirm Password"
-      />
+        <app-text-input formControlName="email" type="email" placeholder="Email" label="Email" />
 
-      <div class="flex items-center justify-between">
-        <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
-        <button [disabled]="!isValidForm" type="submit" class="btn btn-primary">Register</button>
-      </div>
-    </form>
+        <app-text-input
+          formControlName="password"
+          type="password"
+          placeholder="Password"
+          label="Password"
+        />
+
+        <app-text-input
+          formControlName="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          label="Confirm Password"
+        />
+
+        <div class="flex items-center justify-between">
+          <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
+          <button
+            [disabled]="!isValidCredentialsForm"
+            type="button"
+            (click)="nextStep()"
+            class="btn btn-primary"
+          >
+            Next
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (currentStep() === 2) {
+      <form
+        [formGroup]="profileForm"
+        class="flex flex-col gap-4 w-full"
+        (ngSubmit)="register()"
+      >
+        <app-text-input formControlName="gender" type="text" placeholder="Gender" label="Gender" />
+
+        <app-text-input
+          formControlName="dateOfBirth"
+          type="date"
+          placeholder="Date of Birth"
+          label="Date of Birth"
+        />
+
+        <app-text-input formControlName="city" type="text" placeholder="City" label="City" />
+
+        <app-text-input
+          formControlName="country"
+          type="text"
+          placeholder="Country"
+          label="Country"
+        />
+
+        <div class="flex items-center justify-between">
+          <button type="button" (click)="prevStep()" class="btn btn-secondary">Back</button>
+          <button [disabled]="!isValidProfileForm" type="submit" class="btn btn-primary">
+            Register
+          </button>
+        </div>
+      </form>
+    }
   </div>
 </div>
