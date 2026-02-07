@@ -12,6 +12,7 @@ import {
 import { User } from '../../../types/user';
 import { AccountService } from '../../../core/services/account-service';
 import { TextInput } from '../../../shared/text-input/text-input';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -21,6 +22,7 @@ import { TextInput } from '../../../shared/text-input/text-input';
   standalone: true,
 })
 export class Register {
+  protected router = inject(Router); //Router instance to navigate between pages
   //membersFromHome can not be protected as it is used in the template binding
   membersFromHome = input.required<User[]>(); //A signal input to receive data from parent component
   cancelRegister = output<boolean>(); //Pass data from register to parent component, this can not be protected as it is used in the template binding
@@ -79,6 +81,12 @@ export class Register {
     }
   }
 
+  getMaxDate() {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 18);
+    return today.toISOString().split('T')[0]; // Return date in YYYY-MM-DD format for input max attribute
+  }
+
   prevStep(): void {
     if (this.currentStep() > 1) {
       this.currentStep.update((step) => step - 1);
@@ -93,14 +101,11 @@ export class Register {
     const profileData = this.profileForm.value;
     const formData = { userName, email, password, ...profileData };
     this.accountService.register(formData).subscribe({
-      next: (user) => {
-        this.cancel();
-        console.log('Registration successful:', user);
-        //Navigate to another page or update UI accordingly
+      next: () => {
+        this.router.navigate(['/members']); //Navigate to members page after successful registration
       },
       error: (error) => {
         console.error('Registration failed:', error);
-        //Handle error appropriately, e.g., show error message to user
       },
     });
   }
