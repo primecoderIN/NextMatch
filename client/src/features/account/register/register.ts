@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { Component, input, OnInit, output } from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -10,10 +10,11 @@ import {
 } from '@angular/forms';
 import { RegisterCredentials, User } from '../../../types/user';
 import { AccountService } from '../../../core/services/account-service';
+import { TextInput } from '../../../shared/text-input/text-input';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TextInput],
   templateUrl: './register.html',
   styleUrl: './register.css',
   standalone: true,
@@ -27,33 +28,6 @@ export class Register implements OnInit {
 
   get isValidForm(): boolean {
     return this.registerForm.valid;
-  }
-
-  isInvalidValue(controlName: string): boolean {
-    const control = this.registerForm.get(controlName) as FormControl;
-    return control?.invalid && control?.touched;
-  }
-
-  getFormControlErrorInfo(controlName: string): string[] {
-    const control = this.registerForm.get(controlName);
-    if (!control || !control.errors) return [];
-
-    const errors = control.errors;
-    const messages: string[] = [];
-
-    if (errors['required']) {
-      messages.push(`${controlName} is required`);
-    }
-
-    if (errors['minlength']) {
-      messages.push(`Minimum ${errors['minlength'].requiredLength} characters required`);
-    }
-
-    if (errors['maxlength']) {
-      messages.push(`Maximum ${errors['maxlength'].requiredLength} characters allowed`);
-    }
-
-    return messages;
   }
 
   ngOnInit(): void {
