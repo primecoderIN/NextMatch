@@ -34,7 +34,11 @@ export class Register implements OnInit {
     this.registerForm = new FormGroup({
       userName: new FormControl('', Validators.required),
       password: new FormControl('', [Validators.required, Validators.minLength(4)]),
-      confirmPassword: new FormControl('', [Validators.required, this.matchValues('password')]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        this.matchValues('password'),
+      ]),
       email: new FormControl('', [Validators.required, Validators.email]),
     });
 

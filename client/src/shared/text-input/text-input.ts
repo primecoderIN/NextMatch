@@ -24,22 +24,33 @@ export class TextInput implements ControlValueAccessor {
     getFormControlErrorInfo(): string[] {
  
 
-    const errors = this.control.errors || {};
-    const messages: string[] = [];
+      const errors = this.control?.errors || {};
+      const messages: string[] = [];
 
-    if (errors['required']) {
-      messages.push(`${this.label()} is required`);
-    }
+      for (const key of Object.keys(errors)) {
+        const err = (errors as any)[key];
+        switch (key) {
+          case 'required':
+            messages.push(`${this.label?.() ?? 'This field'} is required`);
+            break;
+          case 'minlength':
+            messages.push(`Minimum ${err.requiredLength} characters required`);
+            break;
+          case 'maxlength':
+            messages.push(`Maximum ${err.requiredLength} characters allowed`);
+            break;
+          case 'email':
+            messages.push('Invalid email address');
+            break;
+          case 'passwordMismatch':
+            messages.push('Passwords do not match');
+            break;
+          default:
+            messages.push(`${key}: ${JSON.stringify(err)}`);
+        }
+      }
 
-    if (errors['minlength']) {
-      messages.push(`Minimum ${errors['minlength'].requiredLength} characters required`);
-    }
-
-    if (errors['maxlength']) {
-      messages.push(`Maximum ${errors['maxlength'].requiredLength} characters allowed`);
-    }
-
-    return messages;
+      return messages;
   }
   
   writeValue(obj: any): void {}
