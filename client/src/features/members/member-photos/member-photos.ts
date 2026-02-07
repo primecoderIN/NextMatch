@@ -38,16 +38,36 @@ export class MemberPhotos implements OnInit {
         this.photos.update((currentPhotos) => [...currentPhotos, photo]);
         this.isLoading.set(false);
         this.memberService.isEditModeEnabled.set(false);
+        if(!this.accountService.currentUser()?.imageUrl) {
+          this.setMainPhotoLocal(photo);
+        }
       },
       error: () => {
         this.isLoading.set(false);
-        console.log('Error uploading photo');
       },
     });
   }
 
   setMainPhoto(photo: Photo): void {
     this.memberService.setMainPhoto(photo).subscribe({
+      next: () => {
+        this.setMainPhotoLocal(photo);
+      },
+    });
+  }
+
+  detelePhoto(photo: Photo): void {
+    this.memberService.deletePhoto(photo).subscribe({
+      next: () => {
+        this.photos.update((currentPhotos) =>
+          currentPhotos.filter((p) => p.id !== photo.id)
+        );
+      },
+    }); 
+  }
+
+  private setMainPhotoLocal(photo: Photo): void {
+         this.memberService.setMainPhoto(photo).subscribe({
       next: () => {
         const currentUser = this.accountService.currentUser();
         if (currentUser) {
@@ -62,15 +82,5 @@ export class MemberPhotos implements OnInit {
         }
       },
     });
-  }
-
-  detelePhoto(photo: Photo): void {
-    this.memberService.deletePhoto(photo).subscribe({
-      next: () => {
-        this.photos.update((currentPhotos) =>
-          currentPhotos.filter((p) => p.id !== photo.id)
-        );
-      },
-    }); 
   }
 }
