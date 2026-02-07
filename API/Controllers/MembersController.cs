@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using API.DTOs;
 using API.Extensions;
+using API.Helpers;
 
 
 
@@ -17,9 +18,9 @@ namespace API.Controllers
         // [Authorize] //This is optional here as we have added at class level
         // [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Member>>> GetMembers()
+        public async Task<ActionResult<PaginatedResult<Member>>> GetMembers([FromQuery] PaginationParams paginationParams)
         {
-            return Ok(await memberRepository.GetMembersAsync());
+            return Ok(await memberRepository.GetMembersAsync(paginationParams));
         }
 
 
@@ -150,7 +151,7 @@ namespace API.Controllers
             if (member == null) return NotFound();
 
             var photo = member.Photos.SingleOrDefault(p => p.Id == photoId);
-    
+
 
             if (member.ImageUrl == photo?.Url || photo == null) return BadRequest();
 
