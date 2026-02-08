@@ -21,19 +21,20 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
   {
     var query = context.Members.AsQueryable();
 
-    query = query.Where(x=> x.Id != memberParams.CurrentMemberId);
+    query = query.Where(x => x.Id != memberParams.CurrentMemberId);
 
-    if(memberParams.Gender!=null)
+    if (memberParams.Gender != null)
     {
-      query.Where(x=> x.Gender==memberParams.Gender);
+      var gender = memberParams.Gender.ToLower();
+    query = query.Where(x => x.Gender.ToLower() == gender);
     }
 
-    var minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge-1));
+    var minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
     var maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
-    query = query.Where(x=> x.DateOfBirth>=minDob && x.DateOfBirth<=maxDob);
+    query = query.Where(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
 
-    return await PaginationHelper<Member>.CreateAsync(query, memberParams.PageNumber,memberParams.PageSize);
+    return await PaginationHelper<Member>.CreateAsync(query, memberParams.PageNumber, memberParams.PageSize);
   }
 
   public async Task<IReadOnlyList<Photo>> GetPhotoForMemberAsync(string memberId)

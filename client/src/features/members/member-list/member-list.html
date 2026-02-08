@@ -1,16 +1,30 @@
-@if (paginatedMembers() ; as paginatedMembers) {
-  @if (paginatedMembers.metaData; as metaData) {
-    <app-paginator
-      [pageNumber]="metaData.currentPage"
-      [pageSize]="metaData.pageSize"
-      [totalCount]="metaData.totalCount"
-      (pageChange)="onPageChange($event)"
-    >
-    </app-paginator>
-  }
-  <div class="flex flex-wrap gap-3 ms-13">
-    @for (member of paginatedMembers.items; track member.id) {
-      <app-member-card [member]="member" />
-    }
+@if (paginatedMembers(); as paginatedMembers) {
+  <div class="flex flex-col w-full">
+    <div class="flex justify-between items-center mx-13">
+      <div class="flex gap-2">
+        <button (click)="openModal()" class="btn btn-primary">Select filters</button>
+        <button (click)="resetFilters()" class="btn btn-primary">Reset filters</button>
+      </div>
+      @if (paginatedMembers.metaData; as metaData) {
+        <app-paginator
+          [pageNumber]="metaData.currentPage"
+          [pageSize]="metaData.pageSize"
+          [totalCount]="metaData.totalCount"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-paginator>
+      }
+    </div>
+    <div class="flex flex-wrap gap-3 ms-13">
+      @for (member of paginatedMembers.items; track member.id) {
+        <app-member-card [member]="member" />
+      }
+    </div>
   </div>
 }
+
+<app-filter-modal
+  #filterModal
+  [hidden]="!paginatedMembers()"
+  (submitData)="onFilterChange($event)"
+/>
