@@ -1,5 +1,8 @@
-<div class="flex flex-wrap gap-3 ms-13">
-  @for (member of members$ | async; track member.id) {
-    <app-member-card [member]="member" />
-  }
-</div>
+@if(paginatedMembers$ | async; as paginatedMembers) {
+  <div class="flex flex-wrap gap-3 ms-13">
+    @for (member of paginatedMembers.items; track member.id) {
+      <app-member-card [member]="member" />
+    }
+  </div>
+}
+

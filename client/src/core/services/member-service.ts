@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { EditableMember, Member, Photo } from '../../types/member';
 import { Observable, tap } from 'rxjs';
+import { PaginatedResult } from '../../types/pagination';
 // import { AccountService } from './account-service';
 
 @Injectable({
@@ -12,18 +13,22 @@ export class MemberService {
   private http = inject(HttpClient);
   // private accountService = inject(AccountService);
   private baseUrl = environment.apiUrl;
-   member = signal<Member | null>(null);
+  member = signal<Member | null>(null);
   isEditModeEnabled = signal<boolean>(false);
 
-  getMembers(): Observable<Member[]> {
-    return this.http.get<Member[]>(this.baseUrl + 'members');
+  getMembers(pageNumber: number = 1, pageSize: number = 5): Observable<PaginatedResult<Member[]>> {
+    const params = new HttpParams()
+      .append('pageNumber', pageNumber.toString())
+      .append('pageSize', pageSize.toString());
+
+    return this.http.get<PaginatedResult<Member[]>>(this.baseUrl + 'members', { params });
   }
 
   getMemberById(id: string): Observable<Member> {
     return this.http.get<Member>(this.baseUrl + `members/${id}`).pipe(
-      tap(member=> {
-        this.member.set({...member});
-      })
+      tap((member) => {
+        this.member.set({ ...member });
+      }),
     );
   }
 
@@ -42,10 +47,10 @@ export class MemberService {
   }
 
   setMainPhoto(photo: Photo) {
-    return this.http.put<void>(this.baseUrl + `members/set-default-photo/${photo.id}`,{});
+    return this.http.put<void>(this.baseUrl + `members/set-default-photo/${photo.id}`, {});
   }
 
-  deletePhoto(photo:Photo) {
+  deletePhoto(photo: Photo) {
     return this.http.delete<void>(this.baseUrl + `members/delete-photo/${photo.id}`);
   }
 
