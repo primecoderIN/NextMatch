@@ -1,9 +1,12 @@
 @if (paginatedMembers(); as paginatedMembers) {
   <div class="flex flex-col w-full">
-    <div class="flex justify-between items-center mx-13">
-      <div class="flex gap-2">
+    <div class="flex justify-between  items-center mx-13">
+      <div class="flex items-center gap-2">
         <button (click)="openModal()" class="btn btn-primary">Select filters</button>
         <button (click)="resetFilters()" class="btn btn-primary">Reset filters</button>
+        <div class="text-lg bg-base-100 py-1 px-4 border-2 rounded-lg text-primary capitalize">
+          {{ displayAppliedFilter }}
+        </div>
       </div>
       @if (paginatedMembers.metaData; as metaData) {
         <app-paginator
