@@ -17,10 +17,17 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
     return await context.Members.Include(x => x.User).Include(x => x.Photos).SingleOrDefaultAsync(x => x.Id == id);
   }
 
-  public async Task<PaginatedResult<Member>> GetMembersAsync(PaginationParams paginationParams)
+  public async Task<PaginatedResult<Member>> GetMembersAsync(MemberParams memberParams)
   {
     var query = context.Members.AsQueryable();
-    return await PaginationHelper<Member>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
+
+    query = query.Where(x=> x.Id != memberParams.CurrentMemberId);
+
+    if(memberParams.Gender!=null)
+    {
+      query.Where(x=> x.Gender==memberParams.Gender);
+    }
+    return await PaginationHelper<Member>.CreateAsync(query, memberParams.PageNumber,memberParams.PageSize);
   }
 
   public async Task<IReadOnlyList<Photo>> GetPhotoForMemberAsync(string memberId)

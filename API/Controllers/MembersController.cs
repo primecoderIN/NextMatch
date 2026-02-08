@@ -18,9 +18,10 @@ namespace API.Controllers
         // [Authorize] //This is optional here as we have added at class level
         // [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<PaginatedResult<Member>>> GetMembers([FromQuery] PaginationParams paginationParams)
+        public async Task<ActionResult<PaginatedResult<Member>>> GetMembers([FromQuery] MemberParams memberParams)
         {
-            return Ok(await memberRepository.GetMembersAsync(paginationParams));
+            memberParams.CurrentMemberId = User.GetMemberId();
+            return Ok(await memberRepository.GetMembersAsync(memberParams));
         }
 
 
