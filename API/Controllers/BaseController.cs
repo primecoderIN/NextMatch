@@ -1,7 +1,9 @@
+using API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [ServiceFilter(typeof(LogUserActivity))] //To update user last active time
     [ApiController]
     [Route("api/[controller]")]
     public abstract class BaseController : ControllerBase

@@ -82,6 +82,8 @@ builder.Services.AddDbContext<AppDBContext>(options =>
    ======================= */
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<LogUserActivity>();
+
 /* =======================
    Controllers
    ======================= */
