@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { EditableMember, Member, Photo } from '../../types/member';
 import { Observable, tap } from 'rxjs';
 import { PaginatedResult } from '../../types/pagination';
+import {MemberParams} from "../../types/member"
 // import { AccountService } from './account-service';
 
 @Injectable({
@@ -16,11 +17,16 @@ export class MemberService {
   member = signal<Member | null>(null);
   isEditModeEnabled = signal<boolean>(false);
 
-  getMembers(pageNumber: number = 1, pageSize: number = 5): Observable<PaginatedResult<Member[]>> {
+  getMembers(memberParams: MemberParams): Observable<PaginatedResult<Member[]>> {
     const params = new HttpParams()
-      .append('pageNumber', pageNumber.toString())
-      .append('pageSize', pageSize.toString());
-
+      .append('pageNumber', memberParams.pageNumber)
+      .append('pageSize', memberParams.pageSize)
+      .append("minAge", memberParams.minAge)
+      .append("maxAge", memberParams.maxAge)
+      
+      if(memberParams.gender) {
+        params.append("gender", memberParams.gender);
+      }
     return this.http.get<PaginatedResult<Member[]>>(this.baseUrl + 'members', { params });
   }
 

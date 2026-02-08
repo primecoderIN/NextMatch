@@ -9,5 +9,8 @@ public class MemberParams : PaginationParams //Inherit pagination params and add
 
     public string? CurrentMemberId { get; set; }
 
+    public int MinAge {get;set;}
+
+    public int MaxAge {get;set;}
 
 }
