@@ -14,10 +14,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastService } from '../../../core/services/toast-service';
 import { AccountService } from '../../../core/services/account-service';
+import { TimeAgoPipe } from '../../../core/pipe/time-ago-pipe';
 
 @Component({
   selector: 'app-member-profile',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, TimeAgoPipe],
   templateUrl: './member-profile.html',
   styleUrl: './member-profile.css',
 })
@@ -41,12 +42,10 @@ export class MemberProfile implements OnInit, OnDestroy {
     country: '',
   };
 
-  
-
   ngOnInit(): void {
     const member = this.memberService.member();
 
-    console.log("memmber in profile:", member);
+    console.log('memmber in profile:', member);
 
     this.memberEditData = {
       userName: member?.userName || '',
