@@ -26,13 +26,19 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
     if (memberParams.Gender != null)
     {
       var gender = memberParams.Gender.ToLower();
-    query = query.Where(x => x.Gender.ToLower() == gender);
+      query = query.Where(x => x.Gender.ToLower() == gender);
     }
 
     var minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
     var maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
     query = query.Where(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
+
+    query = memberParams.OrderBy switch
+    {
+      "createdAt" => query.OrderByDescending(x => x.CreatedAt),
+      _ => query.OrderByDescending(x => x.LastActive)
+    };
 
     return await PaginationHelper<Member>.CreateAsync(query, memberParams.PageNumber, memberParams.PageSize);
   }

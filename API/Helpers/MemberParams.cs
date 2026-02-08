@@ -13,4 +13,6 @@ public class MemberParams : PaginationParams //Inherit pagination params and add
 
     public int MaxAge {get;set;}
 
+    public string OrderBy {get;set;}="lastActive";
+
 }
