@@ -1,17 +1,42 @@
 
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
 //Using inline constructors C#12 for simpler dependency injection
 public class AppDBContext(DbContextOptions options) : DbContext(options)
 {
-   public DbSet<AppUser> Users {get;set;}
+   public DbSet<AppUser> Users { get; set; }
 
-   public DbSet<Member> Members {get;set;}
+   public DbSet<Member> Members { get; set; }
 
-   public DbSet<Photo> Photos {get;set;}
+   public DbSet<Photo> Photos { get; set; }
+
+   protected override void OnModelCreating(ModelBuilder modelBuilder)
+   {
+      base.OnModelCreating(modelBuilder);
+
+      var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+       v => v.ToUniversalTime(),
+       v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+      );
+
+
+      foreach (var entity in modelBuilder.Model.GetEntityTypes())
+      {
+
+         foreach (var property in entity.GetProperties())
+         {
+            if (property.ClrType == typeof(DateTime))
+            {
+               property.SetValueConverter(dateTimeConverter);
+            }
+         }
+
+      }
+   }
 
 }
 
