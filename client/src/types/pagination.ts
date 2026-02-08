@@ -1,5 +1,5 @@
 export type Pagination = {
-  pageNumber: number;
+  currentPage: number;
   pageSize: number;
   totalCount: number;
   totalPages: number;
@@ -7,5 +7,5 @@ export type Pagination = {
 
 export type PaginatedResult<T> = {
   items: T;
-  metadata: Pagination;
+  metaData: Pagination;
 };

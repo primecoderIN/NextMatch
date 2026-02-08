@@ -1,8 +1,16 @@
-@if(paginatedMembers$ | async; as paginatedMembers) {
+@if (paginatedMembers$ | async; as paginatedMembers) {
+  @if (paginatedMembers.metaData; as metaData) {
+    <app-paginator
+      [pageNumber]="metaData.currentPage"
+      [pageSize]="metaData.pageSize"
+      [totalCount]="metaData.totalCount"
+      (pageChange)="onPageChange($event)"
+    >
+    </app-paginator>
+  }
   <div class="flex flex-wrap gap-3 ms-13">
     @for (member of paginatedMembers.items; track member.id) {
       <app-member-card [member]="member" />
     }
   </div>
 }
-
