@@ -18,6 +18,23 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
    {
       base.OnModelCreating(modelBuilder);
 
+
+      modelBuilder.Entity<MemberLike>()
+      .HasKey(x => new { x.SourceMemberId, x.TargetMemberId }); //This defines a composite primary key consisting of sourcemember id and target member id
+
+      modelBuilder.Entity<MemberLike>()
+      .HasOne(s => s.SourceMember)
+      .WithMany(t => t.LikedMembers)
+      .HasForeignKey(s => s.SourceMemberId)
+      .OnDelete(DeleteBehavior.Cascade); // A MemberLike has one SourceMember // A Member can have many LikedMembers // SourceMemberId is the FK // Deleting a Member deletes related likes automatically
+
+      modelBuilder.Entity<MemberLike>()
+   .HasOne(s => s.TargetMember)
+   .WithMany(t => t.LikedByMembers)
+   .HasForeignKey(s => s.TargetMemberId)
+   .OnDelete(DeleteBehavior.NoAction); // A MemberLike has one TargetMember // A Member can have many LikedByMembers // TargetMemberId is the foreign key // Deleting a Member deletes likes where they are the target
+
+      //No action in other side of self referencing table prevents multiple cascade paths
       var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
        v => v.ToUniversalTime(),
        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)

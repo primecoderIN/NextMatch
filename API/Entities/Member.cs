@@ -34,7 +34,15 @@ public class Member
 public List<Photo> Photos {get;set;} =[];
 
 
-  [ForeignKey(nameof(Id))]
+//Like navigation property
+
+[JsonIgnore]
+public List<MemberLike> LikedByMembers {get;set;} =[]; //List of users the current users liked by
+
+public List<MemberLike> LikedMembers {get;set;} = []; //List of users that the current user liked 
+
+
+  [ForeignKey(nameof(Id))] //Use the Id property in Member as the foreign key for the User navigation property.
   [JsonIgnore]
   public AppUser User {get;set;} = null!;  
 }
