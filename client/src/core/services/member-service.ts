@@ -23,12 +23,16 @@ export class MemberService {
       .append('pageSize', memberParams.pageSize)
       .append('minAge', memberParams.minAge)
       .append('maxAge', memberParams.maxAge)
-      .append("orderBy", memberParams.orderBy);
+      .append('orderBy', memberParams.orderBy);
 
     if (memberParams.gender) {
       params = params.append('gender', memberParams.gender);
     }
-    return this.http.get<PaginatedResult<Member[]>>(this.baseUrl + 'members', { params });
+    return this.http.get<PaginatedResult<Member[]>>(this.baseUrl + 'members', { params }).pipe(
+      tap(() => {
+        localStorage.setItem('filters', JSON.stringify(memberParams));
+      }),
+    );
   }
 
   getMemberById(id: string): Observable<Member> {
