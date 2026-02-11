@@ -24,8 +24,10 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     return `${url}?${paramsString}`;
   };
 
+  const cacheKey = generateCacheKey(req.url, req.params);
+
   if (req.method === 'GET') {
-    const cachedResponse = cache.get(generateCacheKey(req.url, req.params));
+    const cachedResponse = cache.get(cacheKey);
 
     if (cachedResponse) {
       return of(cachedResponse);
@@ -36,7 +38,7 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     delay(500), //to avoid flickering for fast requests
     tap((response) => {
-      cache.set(req.url, response); //store the response in cache
+      cache.set(cacheKey, response); //store the response in cache
     }),
     finalize(() => busyService.idle()), //runs once nomatter success or error
   );
