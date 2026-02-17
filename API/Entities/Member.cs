@@ -39,6 +39,7 @@ public List<Photo> Photos {get;set;} =[];
 [JsonIgnore]
 public List<MemberLike> LikedByMembers {get;set;} =[]; //List of users the current users liked by
 
+[JsonIgnore]
 public List<MemberLike> LikedMembers {get;set;} = []; //List of users that the current user liked 
 
 

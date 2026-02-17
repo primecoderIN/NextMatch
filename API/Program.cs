@@ -10,6 +10,14 @@ using API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+//Formatting all time to proper utc date time in apis
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeConverter());
+    });
+
 /* =======================
    CORS
    ======================= */
@@ -56,6 +64,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
+builder.Services.AddScoped<ILikesRepository,LikesReporitory>();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); //Key should be same as app settings
 

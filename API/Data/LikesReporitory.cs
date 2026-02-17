@@ -1,37 +1,59 @@
 using API.Entities;
 using API.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
-
-public class LikesReporitory : ILikesRepository
+//Source member likes target member
+public class LikesReporitory(AppDBContext context) : ILikesRepository
 {
-    public void AddLike(MemberLike like)
+
+
+    public async Task<IReadOnlyList<string>> GetCurrentMemberLikeIds(string memberId) //List of users whom current user liked
     {
-        throw new NotImplementedException();
+        return await context.Likes.Where(x => x.SourceMemberId == memberId).Select(x => x.TargetMemberId).ToListAsync();
     }
 
-    public void DeleteLike(MemberLike like)
+    public async Task<MemberLike?> GetMemberLike(string sourceMemberId, string targetMemberId)
     {
-        throw new NotImplementedException();
+        return await context.Likes.FindAsync(sourceMemberId, targetMemberId);
     }
 
-    public Task<IReadOnlyList<string>> GetCurrentMemberLikeIds(string memberId)
+    public async Task<IReadOnlyList<Member>> GetMemberLikes(string predicate, string memberId)
     {
-        throw new NotImplementedException();
+        var query = context.Likes.AsQueryable();
+
+        switch (predicate)
+        {
+            case "liked":
+                return await query.Where(x => x.SourceMemberId == memberId)
+                .Select(x => x.TargetMember)
+                .ToListAsync();
+            case "likedBy":
+                return await query
+                .Where(x => x.TargetMemberId == memberId)
+                .Select(x => x.SourceMember)
+                .ToListAsync();
+            default: //mutual likes
+                var likeIds = await GetCurrentMemberLikeIds(memberId);
+                return await query
+                .Where(x => x.TargetMemberId == memberId && likeIds.Contains(x.SourceMemberId))
+                .Select(x => x.SourceMember).ToListAsync();
+
+        }
     }
 
-    public Task<MemberLike> GetMemberLike(string sourceMemberId, string targetMemberId)
+    public async void AddLike(MemberLike like)
     {
-        throw new NotImplementedException();
+        context.Likes.Add(like);
     }
 
-    public Task<IReadOnlyList<Member>> GetMemberLikes(string predicate, string memberId)
+    public async void DeleteLike(MemberLike like)
     {
-        throw new NotImplementedException();
+        context.Likes.Remove(like);
     }
 
-    public Task<bool> SaveAllChanges()
+    public  async Task<bool> SaveAllChanges()
     {
-        throw new NotImplementedException();
+        return await context.SaveChangesAsync()>0;
     }
 }

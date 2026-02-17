@@ -14,6 +14,8 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
 
    public DbSet<Photo> Photos { get; set; }
 
+   public DbSet<MemberLike> Likes { get; set; }
+
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {
       base.OnModelCreating(modelBuilder);
@@ -29,12 +31,16 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
       .OnDelete(DeleteBehavior.Cascade); // A MemberLike has one SourceMember // A Member can have many LikedMembers // SourceMemberId is the FK // Deleting a Member deletes related likes automatically
 
       modelBuilder.Entity<MemberLike>()
-   .HasOne(s => s.TargetMember)
-   .WithMany(t => t.LikedByMembers)
-   .HasForeignKey(s => s.TargetMemberId)
-   .OnDelete(DeleteBehavior.NoAction); // A MemberLike has one TargetMember // A Member can have many LikedByMembers // TargetMemberId is the foreign key // Deleting a Member deletes likes where they are the target
+      .HasOne(s => s.TargetMember)
+      .WithMany(t => t.LikedByMembers)
+      .HasForeignKey(s => s.TargetMemberId)
+      .OnDelete(DeleteBehavior.NoAction); // A MemberLike has one TargetMember // A Member can have many LikedByMembers // TargetMemberId is the foreign key // Deleting a Member deletes likes where they are the target
 
       //No action in other side of self referencing table prevents multiple cascade paths
+
+
+
+      //Below code is to send proper utc time to frontend
       var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
        v => v.ToUniversalTime(),
        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
