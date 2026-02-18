@@ -41,4 +41,31 @@ public class LikesController(ILikesRepository likesRepository) : BaseController
 
     }
 
+    [HttpGet("list")]
+
+    public async Task<ActionResult<IReadOnlyList<string>>> GetCurrentMemberLikeIds()
+    {
+        var memberId = User.GetMemberId();
+
+        if (memberId == null)
+        {
+            return Unauthorized();
+        }
+        return Ok(await likesRepository.GetCurrentMemberLikeIds(memberId));
+    }
+
+
+    [HttpGet]
+
+    public async Task<ActionResult<IReadOnlyList<Member>>> GetMemberLikes(string predicate)
+    {
+        var currentMemberId = User.GetMemberId();
+
+        if (currentMemberId == null) return Unauthorized();
+
+        var members = await likesRepository.GetMemberLikes(predicate, currentMemberId);
+
+        return Ok(members);
+    }
+
 }
