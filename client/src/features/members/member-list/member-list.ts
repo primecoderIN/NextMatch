@@ -5,6 +5,7 @@ import { MemberCard } from '../member-card/member-card';
 import { PaginatedResult } from '../../../types/pagination';
 import { Paginator } from '../../../shared/paginator/paginator';
 import { FilterModal } from '../filter-modal/filter-modal';
+import { LikesService } from '../../../core/services/likes-service';
 
 @Component({
   selector: 'app-member-list',
@@ -18,6 +19,7 @@ export class MemberList implements OnInit {
   protected paginatedMembers = signal<PaginatedResult<Member[]> | null>(null);
   protected memberParams = new MemberParams();
   protected appliedFilters = new MemberParams();
+  protected likesService = inject(LikesService);
 
   constructor() {
     const filters = localStorage.getItem("filters");
@@ -30,6 +32,7 @@ export class MemberList implements OnInit {
 
   ngOnInit(): void {
     this.loadMembers();
+    this.likesService.getLikeIds();
   }
 
   loadMembers() {

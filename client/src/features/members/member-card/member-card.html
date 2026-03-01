@@ -5,7 +5,7 @@
   >
     <img [src]="member.imageUrl" [alt]="member.userName" class="rounded-lg h-50 w-50" />
 
-    <button class="absolute top-1 right-1 z-40 btn btn-ghost btn-circle p-1">
+    <button class="absolute top-1 right-1 z-40 btn btn-ghost btn-circle p-1" (click)="toggleLike($event)">
       <svg
       [attr.fill]="hasLiked()?'red':'none'"
         xmlns="http://www.w3.org/2000/svg"
