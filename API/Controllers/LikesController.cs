@@ -1,6 +1,7 @@
 
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,13 +58,13 @@ public class LikesController(ILikesRepository likesRepository) : BaseController
 
     [HttpGet]
 
-    public async Task<ActionResult<IReadOnlyList<Member>>> GetMemberLikes(string predicate)
+    public async Task<ActionResult<PaginatedResult<Member>>> GetMemberLikes([FromQuery] LikeParams likeParams)
     {
         var currentMemberId = User.GetMemberId();
 
         if (currentMemberId == null) return Unauthorized();
 
-        var members = await likesRepository.GetMemberLikes(predicate, currentMemberId);
+        var members = await likesRepository.GetMemberLikes(likeParams);
 
         return Ok(members);
     }
