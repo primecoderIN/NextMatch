@@ -80,6 +80,8 @@ builder.Services.AddRouting(options =>
 /* =======================
    Database
    ======================= */
+   //This options are passed to the base DbContext constructor in AppDBContext, which is required for EF Core to function properly.
+   //Because AppDBContext needs to know how to conect to the dabatase. 
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseSqlite(
@@ -107,7 +109,7 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); //Not required if we enforce https in angular dev server, but good to have in production environment
 
 app.UseRouting();
 

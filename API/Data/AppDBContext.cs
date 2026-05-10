@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
-//Using inline constructors C#12 for simpler dependency injection
+//Using inline constructors C#12(Primary constructor) for simpler dependency injection
 public class AppDBContext(DbContextOptions options) : DbContext(options)
 {
    public DbSet<AppUser> Users { get; set; }
@@ -65,16 +65,65 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
 
 
 
-//not inline 
+//not inline  - old constructor approach
 
 // public class AppDBContext : DbContext
 // {
+//     // Old constructor approach
 //     public AppDBContext(DbContextOptions options) : base(options)
 //     {
 
 //     }
 
 //     public DbSet<AppUser> Users { get; set; }
+
+//     public DbSet<Member> Members { get; set; }
+
+//     public DbSet<Photo> Photos { get; set; }
+
+//     public DbSet<MemberLike> Likes { get; set; }
+
+//     protected override void OnModelCreating(ModelBuilder modelBuilder)
+//     {
+//         base.OnModelCreating(modelBuilder);
+
+//         // Composite primary key
+//         modelBuilder.Entity<MemberLike>()
+//             .HasKey(x => new { x.SourceMemberId, x.TargetMemberId });
+
+//         // SourceMember relationship
+//         modelBuilder.Entity<MemberLike>()
+//             .HasOne(s => s.SourceMember)
+//             .WithMany(t => t.LikedMembers)
+//             .HasForeignKey(s => s.SourceMemberId)
+//             .OnDelete(DeleteBehavior.Cascade);
+
+//         // TargetMember relationship
+//         modelBuilder.Entity<MemberLike>()
+//             .HasOne(s => s.TargetMember)
+//             .WithMany(t => t.LikedByMembers)
+//             .HasForeignKey(s => s.TargetMemberId)
+//             .OnDelete(DeleteBehavior.NoAction);
+
+//         // Prevents multiple cascade paths in self-referencing table
+
+//         // UTC DateTime converter
+//         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+//             v => v.ToUniversalTime(),
+//             v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+//         );
+
+//         foreach (var entity in modelBuilder.Model.GetEntityTypes())
+//         {
+//             foreach (var property in entity.GetProperties())
+//             {
+//                 if (property.ClrType == typeof(DateTime))
+//                 {
+//                     property.SetValueConverter(dateTimeConverter);
+//                 }
+//             }
+//         }
+//     }
 // }
 
 
