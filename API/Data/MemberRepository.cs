@@ -9,7 +9,8 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
 {
   public async Task<Member?> GetMemberByIdAsyc(string id) //Just to get a single member by id
   {
-    return await context.Members.FindAsync(id);
+    return await context.Members.FindAsync(id); //FindAsync is a method provided by EF Core that retrieves an entity by its primary key. It returns null if no entity is found with the given id.
+    //FindAsync is more efficient than SingleOrDefaultAsync for primary key lookups because it can take advantage of EF Core's first-level cache and doesn't require a database query if the entity is already tracked in memory.
   }
 
   public async Task<Member?> GetMemberByIdForUpdate(string id)
