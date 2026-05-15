@@ -27,7 +27,10 @@ namespace API.Controllers
             {
                 return BadRequest("Email is already registered");
             }
-            using var hmac = new HMACSHA512(); //using removes the object after use to free up memory
+            using var hmac = new HMACSHA512(); //using removes the object after use to free up memory, it dos not wait for garbage collection
+
+            //DBCOntext and token service are automatically freed up by the framework as they are registered in the dependency injection container, so we don't need to worry about disposing them. However, for the HMACSHA512 instance, we need to ensure that it is properly disposed of after use to free up any resources it may be holding. By using the 'using' statement, we ensure that the HMACSHA512 instance is disposed of correctly once we are done with it, preventing any potential memory leaks or resource issues.
+            //For hmac, we need to dispose it after use because it implements the IDisposable interface, which means it may be holding onto unmanaged resources that need to be released explicitly. By using the 'using' statement, we ensure that the Dispose method is called on the HMACSHA512 instance when we are finished with it, allowing it to clean up any resources it may be using.
 
             var newUser = new AppUser
             {
