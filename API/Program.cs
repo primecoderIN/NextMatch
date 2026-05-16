@@ -92,7 +92,8 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 /* =======================
    Application Services
    ======================= */
-builder.Services.AddScoped<ITokenService, TokenService>();
+   //This service is needed to generate JWT tokens for user authentication. By registering it in the dependency injection container, we can easily inject it into our controllers and other services where we need to create tokens for authenticated users. This allows us to centralize our token generation logic and makes it easier to maintain and update in the future if needed.
+builder.Services.AddScoped<ITokenService, TokenService>(); //Scoped means a new instance of the service will be created for each HTTP request, and that same instance will be used throughout the entire request. This is useful for services that need to maintain state or perform operations that are specific to a single request, such as database contexts or services that handle user authentication. By using scoped services, we can ensure that each request gets its own instance of the service, which can help prevent issues with shared state and improve the overall performance and reliability of the application.
 
 builder.Services.AddScoped<LogUserActivity>();
 
