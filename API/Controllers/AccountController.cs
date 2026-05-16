@@ -77,6 +77,8 @@ namespace API.Controllers
 
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
 
+            //Becase hash is a byte array we need to compare each byte of the computed hash with the stored password hash, if any byte does not match, we return unauthorized
+
             for (int i = 0; i < computedHash.Length; i++)
             {
                 if (computedHash[i] != user.PasswordHash[i])
