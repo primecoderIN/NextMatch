@@ -127,7 +127,7 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDBContext>();
-    await context.Database.MigrateAsync(); //Asynchronously applies pending migrations
+    await context.Database.MigrateAsync(); //Asynchronously applies pending migrations and creates the database if it does not already exist. This is a convenient way to ensure that the database schema is up to date with the latest migrations when the application starts. By calling this method, we can automatically apply any new migrations that have been added since the last time the application was run, which helps to keep the database schema in sync with the application's data model and ensures that any changes to the data model are properly reflected in the database.
     await Seed.SeedUsers(context);
 }
 catch (Exception ex)

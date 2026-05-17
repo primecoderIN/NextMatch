@@ -47,9 +47,9 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
   public async Task<IReadOnlyList<Photo>> GetPhotoForMemberAsync(string memberId)
   {
     return await context.Members
-    .Where(x => x.Id == memberId)
-    .SelectMany(x => x.Photos)
-    .ToListAsync();
+    .Where(x => x.Id == memberId) //Find the member with the specified memberId
+    .SelectMany(x => x.Photos) //Get photos for that member ,SelectMany is used to flatten the collection of photos for the member into a single sequence of photos.
+    .ToListAsync(); //Execute the query and return the result as a list of photos. ToListAsync is an asynchronous version of ToList that executes the query and returns the results as a List<T>.
   }
 
   public async Task<bool> SaveAllAsync()
