@@ -54,11 +54,11 @@ public class MemberRepository(AppDBContext context) : IMemberRepository
 
   public async Task<bool> SaveAllAsync()
   {
-    return await context.SaveChangesAsync() > 0; //1 or more items saved into database
+    return await context.SaveChangesAsync() > 0; //If it is greater than 0, it means that one or more changes were successfully saved to the database, and we return true. If it is 0, it means that no changes were made to the database, and we return false.
   }
 
-  public void Update(Member member)
+  public void Update(Member member) //This method is used to mark an entity as modified in the context, which means that when SaveChangesAsync is called, EF Core will generate an UPDATE statement for that entity in the database. By calling this method, we can ensure that any changes made to the member entity are properly tracked and persisted to the database when SaveChangesAsync is called.
   {
-    context.Entry(member).State = EntityState.Modified;
+    context.Entry(member).State = EntityState.Modified; //This line of code is used to mark the state of the member entity as modified in the Entity Framework Core (EF Core) context. By setting the state to EntityState.Modified, we are indicating to EF Core that the member entity has been changed and should be updated in the database when SaveChangesAsync is called. This is necessary because EF Core uses change tracking to determine which entities have been modified and need to be persisted to the database. By marking the entity as modified, we ensure that any changes made to the member entity will be properly saved to the database when SaveChangesAsync is called.
   }
 }
