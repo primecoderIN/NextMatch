@@ -2,6 +2,12 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+
+// | Code                        | Purpose                                                      |
+// | --------------------------- | ------------------------------------------------------------ |
+// | EF Core `ValueConverter`    | Controls how DateTime is stored/retrieved from database      |
+// | JSON `UtcDateTimeConverter` | Controls how DateTime is serialized/deserialized in API JSON |
+
 public class UtcDateTimeConverter : JsonConverter<DateTime>
 {
     private const string Format = "yyyy-MM-ddTHH:mm:ss.fffZ";

@@ -41,20 +41,20 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
 
 
       //Below code is to send proper utc time to frontend
-      var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+      var dateTimeConverter = new ValueConverter<DateTime, DateTime>( //This creates a new ValueConverter that converts DateTime values to UTC when saving to the database and converts them back to DateTime with the kind set to UTC when retrieving from the database.
        v => v.ToUniversalTime(),
        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
       );
 
 
-      foreach (var entity in modelBuilder.Model.GetEntityTypes())
+      foreach (var entity in modelBuilder.Model.GetEntityTypes()) //Iterates through all entity types in the model
       {
 
-         foreach (var property in entity.GetProperties())
+         foreach (var property in entity.GetProperties()) //Iterates through all properties of each entity type
          {
-            if (property.ClrType == typeof(DateTime))
+            if (property.ClrType == typeof(DateTime)) //Checks if the property type is DateTime
             {
-               property.SetValueConverter(dateTimeConverter);
+               property.SetValueConverter(dateTimeConverter); //If it is a DateTime property, it applies the dateTimeConverter to ensure that all DateTime values are stored and retrieved as UTC in the database
             }
          }
 
