@@ -16,6 +16,8 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
 
    public DbSet<MemberLike> Likes { get; set; }
 
+   public DbSet<Messages> Messages { get; set; }
+
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {
       base.OnModelCreating(modelBuilder);
@@ -37,6 +39,16 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
       .OnDelete(DeleteBehavior.NoAction); // A MemberLike has one TargetMember // A Member can have many LikedByMembers // TargetMemberId is the foreign key // Deleting a Member deletes likes where they are the target
 
       //No action in other side of self referencing table prevents multiple cascade paths
+
+      modelBuilder.Entity<Messages>()
+      .HasOne(m=>m.Sender)
+      .WithMany(m => m.MessagesSent)
+      .OnDelete(DeleteBehavior.Restrict); //Restrict prevents cascade delete and allows us to keep messages even if a user is deleted, but it will not allow deletion of a user if they have sent or received messages, ensuring data integrity and preserving message history.
+
+      modelBuilder.Entity<Messages>()
+      .HasOne(m=>m.Recipient)
+      .WithMany(m => m.MessagesReceived)
+      .OnDelete(DeleteBehavior.Restrict); //Restrict prevents cascade delete and allows us to keep messages even if a user is deleted, but it will not allow deletion of a user if they have sent or received messages, ensuring data integrity and preserving message history.
 
 
 
