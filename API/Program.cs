@@ -79,6 +79,10 @@ builder.Services.AddRouting(options =>
     options.LowercaseUrls = true;
 });
 
+// Swagger/OpenAPI (only enabled in Development)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 /* =======================
    Database
    ======================= */
@@ -122,6 +126,13 @@ app.UseAuthentication(); // Who are you
 app.UseAuthorization();  // What are you allowed to do
 
 app.MapControllers();
+
+// Enable Swagger only in Development environment
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 //Creating scope outside http request pipeline to do migrations
 using var scope = app.Services.CreateScope();
