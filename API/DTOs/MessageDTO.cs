@@ -1,6 +1,6 @@
 namespace API.DTOs;
 
-public class MessagesDTO
+public class MessageDTO
 {
     public required string Id { get; set; }
 

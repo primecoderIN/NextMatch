@@ -2,7 +2,7 @@
 
 namespace API.Entities;
 
-public class Messages
+public class Message
 {
     public  string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -28,4 +28,4 @@ public class Messages
 }
 
 
-//Each user can send many messages and receive many messages, so we have a one-to-many relationship between the Member entity and the Messages entity. The SenderId and RecipientId properties are foreign keys that reference the Member entity, allowing us to establish the relationship between the sender and receiver of each message.
+//Each user can send many messages and receive many messages, so we have a one-to-many relationship between the Member entity and the Message entity. The SenderId and RecipientId properties are foreign keys that reference the Member entity, allowing us to establish the relationship between the sender and receiver of each message.

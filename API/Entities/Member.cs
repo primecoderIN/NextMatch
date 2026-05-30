@@ -43,10 +43,10 @@ public List<MemberLike> LikedByMembers {get;set;} =[]; //List of users the curre
 public List<MemberLike> LikedMembers {get;set;} = []; //List of users that the current user liked 
 
 [JsonIgnore]
-public List<Messages> MessagesSent {get;set;} = []; //List of messages sent by the current user
+public List<Message> MessagesSent {get;set;} = []; //List of messages sent by the current user
 
 [JsonIgnore]
-public List<Messages> MessagesReceived {get;set;} = []; //List of messages received by the current user
+public List<Message> MessagesReceived {get;set;} = []; //List of messages received by the current user
 
 
   [ForeignKey(nameof(Id))] //Use the Id property in Member as the foreign key for the User navigation property.

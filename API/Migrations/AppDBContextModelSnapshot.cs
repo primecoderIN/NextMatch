@@ -102,7 +102,7 @@ namespace API.Migrations
                     b.ToTable("Likes");
                 });
 
-            modelBuilder.Entity("API.Entities.Messages", b =>
+            modelBuilder.Entity("API.Entities.Message", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -194,7 +194,7 @@ namespace API.Migrations
                     b.Navigation("TargetMember");
                 });
 
-            modelBuilder.Entity("API.Entities.Messages", b =>
+            modelBuilder.Entity("API.Entities.Message", b =>
                 {
                     b.HasOne("API.Entities.Member", "Recipient")
                         .WithMany("MessagesReceived")

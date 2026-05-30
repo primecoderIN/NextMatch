@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 public class MessagesController(IMessageRepository messageRepository, IMemberRepository memberRepository) : BaseController
 {
    [HttpPost]
-   public async Task<ActionResult<MessagesDTO>> CreateMessage(CreateMessageDTO createMessageDTO)
+   public async Task<ActionResult<MessageDTO>> CreateMessage(CreateMessageDTO createMessageDTO)
     {
         //Get Details of logged in user
         var sender = await  memberRepository.GetMemberByIdAsyc(User.GetMemberId());
@@ -21,7 +21,7 @@ public class MessagesController(IMessageRepository messageRepository, IMemberRep
             return BadRequest("Can not send this message");
         }
 
-        var message = new Messages
+        var message = new Message
         {
             SenderId = sender.Id,
             RecipientId = receipent.Id,

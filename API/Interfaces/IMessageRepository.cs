@@ -6,13 +6,13 @@ namespace API.Interfaces
 {
     public interface IMessageRepository
     {
-        void AddMessage(Messages message);
-        void DeleteMessage(Messages message);
+        void AddMessage(Message message);
+        void DeleteMessage(Message message);
 
-        Task<Messages?> GetMessage(int messageId);
-        Task<PaginatedResult<MessagesDTO>> GetMessagesForMember();
+        Task<Message?> GetMessage(int messageId);
+        Task<PaginatedResult<MessageDTO>> GetMessagesForMember();
 
-        Task<IReadOnlyList<MessagesDTO>> GetMessageThread(string currentMemberId, string recipientMemberId);
+        Task<IReadOnlyList<MessageDTO>> GetMessageThread(string currentMemberId, string recipientMemberId);
 
         Task<bool> SaveAllAsync();
     }

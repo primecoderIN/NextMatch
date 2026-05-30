@@ -1,11 +1,11 @@
 using API.DTOs;
 using API.Entities;
 
-public static class MesagesExtension
+public static class MessageExtension
 {
-    public static MessagesDTO AsMessageDTO(this Messages message)
+    public static MessageDTO AsMessageDTO(this Message message)
     {
-        return new MessagesDTO
+        return new MessageDTO
         {
             Id = message.Id,
             SenderId = message.SenderId,

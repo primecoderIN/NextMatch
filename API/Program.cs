@@ -67,7 +67,7 @@ builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
 builder.Services.AddScoped<ILikesRepository,LikesReporitory>();
 
-builder.Services.AddScoped<IMessageRepository, MessagesRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); //Key should be same as app settings
 
