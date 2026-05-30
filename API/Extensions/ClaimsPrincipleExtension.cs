@@ -6,8 +6,9 @@ namespace API.Extensions;
 
 public static class ClaimsPrincipleExtension
 {
-    public static string? GetMemberId(this ClaimsPrincipal user)
-    {
-        return user.FindFirstValue(ClaimTypes.NameIdentifier);
-    }
+   public static string GetMemberId(this ClaimsPrincipal user)
+{
+    return user.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new UnauthorizedAccessException("Member ID claim not found");
+}
 }
