@@ -1,5 +1,6 @@
 using API.Entities;
 using API.Helpers;
+using API.DTOs;
 
 namespace API.Interfaces
 {
@@ -8,10 +9,10 @@ namespace API.Interfaces
         void AddMessage(Messages message);
         void DeleteMessage(Messages message);
 
-        Task<Messages> GetMessage(int id);
-        Task<PaginatedResult<Messages>> GetMessagesForMember();
+        Task<Messages?> GetMessage(int messageId);
+        Task<PaginatedResult<MessagesDTO>> GetMessagesForMember();
 
-        Task<IReadOnlyList<Messages>> GetMessageThread(string currentMemberId, string recipientMemberId);
+        Task<IReadOnlyList<MessagesDTO>> GetMessageThread(string currentMemberId, string recipientMemberId);
 
         Task<bool> SaveAllAsync();
     }
