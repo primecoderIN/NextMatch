@@ -1,6 +1,7 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 // import { MemberService } from '../../../core/services/member-service';
 import {
+  ActivatedRoute,
   NavigationEnd,
   Router,
   RouterLink,
@@ -28,6 +29,7 @@ export class MemberDetail implements OnInit {
   protected memberService = inject(MemberService);
   protected busyService = inject(BusyService);
   private accountService = inject(AccountService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
   private likesService = inject(LikesService);
