@@ -20,6 +20,12 @@ export class Nav {
   protected toastService = inject(ToastService);
   protected busyService = inject(BusyService);
 
+  closeMenu(menu: HTMLDetailsElement | null): void {
+    if (menu) {
+      menu.open = false;
+    }
+  }
+
   login(): void {
     this.accountService.login(this.credentials).subscribe({
       next: () => {
@@ -34,7 +40,11 @@ export class Nav {
     });
   }
 
-  logout(): void {
+  logout(menu?: HTMLDetailsElement | null): void {
+    if (menu) {
+      menu.open = false;
+    }
+
     this.accountService.logout();
     this.routerService.navigateByUrl('/');
   }

@@ -92,7 +92,7 @@
 
     <div class="ml-auto flex items-center gap-3">
       @if (accountService.currentUser(); as user) {
-        <details class="group relative">
+        <details class="group relative" #userMenu>
           <summary
             class="flex cursor-pointer list-none select-none items-center gap-2 rounded-xl px-2 py-1.5 text-white hover:bg-white/10 [&::-webkit-details-marker]:hidden"
           >
@@ -114,8 +114,8 @@
           <ul
             class="absolute right-0 z-10 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-sm text-slate-700 shadow-xl"
           >
-            <li><a routerLink="/members/{{ user.id }}/profile" class="block rounded-lg px-3 py-2 hover:bg-slate-100">Edit profile</a></li>
-            <li (click)="logout()"><a class="block cursor-pointer rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50">Logout</a></li>
+            <li><a routerLink="/members/{{ user.id }}/profile" (click)="closeMenu(userMenu)" class="block rounded-lg px-3 py-2 hover:bg-slate-100">Edit profile</a></li>
+            <li><a (click)="logout(userMenu)" class="block cursor-pointer rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50">Logout</a></li>
           </ul>
         </details>
       } @else {
