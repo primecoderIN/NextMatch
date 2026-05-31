@@ -1,0 +1,39 @@
+/* Message thread layout */
+.message-thread-root {
+	display: flex;
+	flex-direction: column;
+	height: 520px;
+}
+
+.thread-header {
+	min-height: 64px;
+}
+
+.thread-body {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding-right: 12px;
+	background: linear-gradient(180deg, rgba(248,250,252,0.6), rgba(255,255,255,0));
+}
+
+.thread-compose {
+	flex-shrink: 0;
+}
+
+.message-row {
+	display: flex;
+	align-items: flex-end;
+}
+
+.message-bubble {
+	line-height: 1.25;
+}
+
+/* Small screens adjustments */
+@media (max-width: 640px) {
+	.message-thread-root { height: 420px; }
+	.message-bubble { max-width: 85%; }
+}
+
+/* Utility to ensure messages wrap nicely */
+.whitespace-pre-wrap { white-space: pre-wrap; word-break: break-word; }

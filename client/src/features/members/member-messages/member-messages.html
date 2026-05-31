@@ -1,6 +1,51 @@
-<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
-  <h3 class="text-lg font-semibold text-slate-800">Start a conversation</h3>
-  <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-    Direct messaging for this profile is ready for the next step of the conversation experience.
-  </p>
+<div class="message-thread-root rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+  <div class="thread-header flex items-center gap-4 px-4 py-3 border-b border-slate-100">
+    <img [src]="memberService.member()?.imageUrl || '/user.png'" [alt]="memberService.member()?.userName" class="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200" />
+    <div class="min-w-0">
+      <div class="truncate font-semibold text-slate-800">{{ memberService.member()?.userName }}</div>
+      <div class="text-xs text-slate-400">Conversation</div>
+    </div>
+  </div>
+
+  <div class="thread-body p-4" id="threadScroll">
+    @if (messageThread().length === 0 && busyService.busyRequestCount() > 0) {
+      <app-skeleton layout="list" [count]="4"></app-skeleton>
+    } @else if (messageThread(); as messages) {
+      @if (messages.length > 0) {
+        @for (message of messages; track message.id) {
+          @if (message.senderId === currentUserId()) {
+            <div class="message-row self-end flex items-end justify-end gap-3 my-3">
+              <div class="message-bubble bg-indigo-600 text-white max-w-[70%] p-3 rounded-lg rounded-br-none shadow-sm">
+                <p class="whitespace-pre-wrap text-sm">{{ message.content }}</p>
+                @if (message.messageSent) {
+                  <div class="text-[11px] mt-2 text-white/80 text-right">{{ message.messageSent | timeAgo }}</div>
+                }
+              </div>
+              <img [src]="message.senderImageUrl || '/user.png'" [alt]="message.senderUsername" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200" />
+            </div>
+          } @else {
+            <div class="message-row self-start flex items-start gap-3 my-3">
+              <img [src]="message.senderImageUrl || '/user.png'" [alt]="message.senderUsername" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200" />
+              <div class="message-bubble bg-slate-100 text-slate-800 max-w-[70%] p-3 rounded-lg rounded-bl-none shadow-sm">
+                <div class="text-xs font-semibold text-slate-700">{{ message.senderUsername }}</div>
+                <p class="whitespace-pre-wrap text-sm mt-1">{{ message.content }}</p>
+                @if (message.messageSent) {
+                  <div class="text-[11px] mt-2 text-slate-400">{{ message.messageSent | timeAgo }}</div>
+                }
+              </div>
+            </div>
+          }
+        }
+      } @else {
+        <div class="px-6 py-10 text-center text-slate-500">No messages yet — say hello 👋</div>
+      }
+    }
+  </div>
+
+  <div class="thread-compose border-t border-slate-100 p-4 bg-slate-50">
+    <div class="flex gap-3">
+      <textarea rows="2" placeholder="Write a message..." class="flex-1 resize-none rounded-lg border border-slate-200 p-3 text-sm bg-white" [value]="newMessage()" (input)="newMessage.set($any($event.target).value)"></textarea>
+      <button class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700" (click)="sendMessage()">Send</button>
+    </div>
+  </div>
 </div>
