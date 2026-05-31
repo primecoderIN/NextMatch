@@ -128,5 +128,18 @@
         "City": "Lupton",
         "Country": "Luxembourg",
         "ImageUrl": "https://randomuser.me/api/portraits/men/93.jpg"
+    },
+    {
+        "Id": "tom-id",
+        "Email": "tom@test.com",
+        "Gender": "male",
+        "DateOfBirth": "1992-11-02",
+        "UserName": "Tom",
+        "CreatedAt": "2023-05-14",
+        "LastActive": "2024-06-20",
+        "Description": "Easygoing traveler who loves coffee, hiking, and good conversation.",
+        "City": "Lakeview",
+        "Country": "Ireland",
+        "ImageUrl": "https://randomuser.me/api/portraits/men/65.jpg"
     }
 ]

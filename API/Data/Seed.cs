@@ -66,5 +66,52 @@ public class Seed
           
         }
           await context.SaveChangesAsync();
+
+        if (!await context.Messages.AnyAsync())
+        {
+            var lisa = await context.Members.SingleOrDefaultAsync(m => m.Id == "lisa-id");
+            var tom = await context.Members.SingleOrDefaultAsync(m => m.Id == "tom-id");
+
+            if (lisa != null && tom != null)
+            {
+                var messages = new List<Message>
+                {
+                    new Message
+                    {
+                        SenderId = lisa.Id,
+                        RecipientId = tom.Id,
+                        Content = "Hey Tom, I loved your profile. Want to grab a coffee this weekend?",
+                        MessageSent = DateTime.UtcNow.AddHours(-5),
+                        DateRead = DateTime.UtcNow.AddHours(-4)
+                    },
+                    new Message
+                    {
+                        SenderId = tom.Id,
+                        RecipientId = lisa.Id,
+                        Content = "Hi Lisa! That sounds great, I'm free on Saturday afternoon.",
+                        MessageSent = DateTime.UtcNow.AddHours(-4),
+                        DateRead = DateTime.UtcNow.AddHours(-3)
+                    },
+                    new Message
+                    {
+                        SenderId = lisa.Id,
+                        RecipientId = tom.Id,
+                        Content = "Perfect, let's meet at the café by the park at 3pm.",
+                        MessageSent = DateTime.UtcNow.AddHours(-3),
+                        DateRead = DateTime.UtcNow.AddHours(-2)
+                    },
+                    new Message
+                    {
+                        SenderId = tom.Id,
+                        RecipientId = lisa.Id,
+                        Content = "Sounds good, see you there!",
+                        MessageSent = DateTime.UtcNow.AddHours(-2)
+                    }
+                };
+
+                context.Messages.AddRange(messages);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }
