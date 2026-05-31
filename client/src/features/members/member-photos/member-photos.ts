@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MemberService } from '../../../core/services/member-service';
 import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../../types/member';
@@ -21,6 +21,12 @@ export class MemberPhotos implements OnInit {
   private route = inject(ActivatedRoute);
   protected photos = signal<Photo[]>([]);
   protected isLoading = signal<boolean>(false);
+
+  protected isCurrentUserPhotos = computed(() => {
+    const currentUserId = this.accountService.currentUser()?.id;
+    const profileId = this.route.parent?.snapshot.paramMap.get('id');
+    return currentUserId !== undefined && profileId !== null && currentUserId === profileId;
+  });
 
   ngOnInit(): void {
     const memberId = this.route.parent?.snapshot.paramMap.get('id');
