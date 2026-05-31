@@ -1,58 +1,44 @@
 @if (this.memberService.member(); as member) {
-  <div class="flex">
-    <div class="card bg-base-100 flex flex-col h-[85vh] w-1/4">
-      <img
-        src="{{ member.imageUrl }}"
-        alt="{{ member.userName }}"
-        class="rounded-full mx-10 mt-3 object-cover"
-      />
-      <div class="card-body">
-        <div class="flex flex-col items-center">
-          <div class="flex text-2xl text-primary">
-            {{ member.userName }} , {{ member.dateOfBirth | age }}
-          </div>
-
-          <div class="text-sm">{{ member.city }}, {{ member.country }}</div>
-
-          <div class="divider"></div>
-
-          <ul class="menu rounded-box w-full text-xl">
-            <li>
-              <a routerLink="profile" routerLinkActive="text-primary">Profile</a>
-            </li>
-            <li>
-              <a routerLink="photos" routerLinkActive="text-primary">Photos</a>
-            </li>
-            <li>
-              <a routerLink="messages" routerLinkActive="text-primary">Messages</a>
-            </li>
-          </ul>
-        </div>
-        <div class="card-actions justify-between gap-2 px-2 mb-3">
-          <button class="btn btn-info flex-1" (click)="goBack()">Go back</button>
-          @if (!isCurrentUser()) {
-            <button class="btn btn-primary flex-1" (click)="toggleLike(member.id)">
-              {{ hasLiked(member.id) ? 'Unlike user' : 'Like user' }}
-            </button>
-          }
-        </div>
+  <section class="grid gap-5 lg:grid-cols-[280px_1fr]">
+    <aside class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="bg-linear-to-br from-indigo-600 to-slate-900 px-5 py-6 text-center text-white">
+        <img [src]="member.imageUrl || '/user.png'" [alt]="member.userName" class="mx-auto size-32 rounded-full object-cover ring-4 ring-white/25" />
+        <h1 class="mt-4 text-2xl font-bold">{{ member.userName }}, {{ member.dateOfBirth | age }}</h1>
+        <p class="mt-1 text-sm text-indigo-100">{{ member.city }}, {{ member.country }}</p>
       </div>
-    </div>
-    <div class="card bg-base-100 w-3/4 p-6">
-      <div class="flex items-center justify-between">
-        <h3 class="card-title text-3xl text-primary">{{ title() }}</h3>
 
-        @if (isCurrentUser()) {
-          <button class="btn btn-outline btn-secondary" (click)="toggleEditMode()">
-            {{ !memberService.isEditModeEnabled() ? 'Edit' : 'Cancel' }}
+      <nav class="flex flex-col gap-1 p-3 text-sm font-semibold text-slate-600">
+        <a routerLink="profile" routerLinkActive="bg-indigo-50 text-indigo-700" class="rounded-xl px-3 py-2.5 hover:bg-slate-50 hover:text-slate-900">Profile</a>
+        <a routerLink="photos" routerLinkActive="bg-indigo-50 text-indigo-700" class="rounded-xl px-3 py-2.5 hover:bg-slate-50 hover:text-slate-900">Photos</a>
+        <a routerLink="messages" routerLinkActive="bg-indigo-50 text-indigo-700" class="rounded-xl px-3 py-2.5 hover:bg-slate-50 hover:text-slate-900">Messages</a>
+      </nav>
+
+      <div class="grid gap-2 border-t border-slate-100 p-3">
+        <button class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50" (click)="goBack()">Go back</button>
+        @if (!isCurrentUser()) {
+          <button class="rounded-xl bg-rose-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-600" (click)="toggleLike(member.id)">
+            {{ hasLiked(member.id) ? 'Unlike user' : 'Like user' }}
           </button>
         }
       </div>
+    </aside>
 
-      <div class="divider"></div>
-      <div><router-outlet></router-outlet></div>
+    <div class="min-h-[70vh] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">Member details</p>
+          <h2 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">{{ title() }}</h2>
+        </div>
+        @if (isCurrentUser()) {
+          <button class="rounded-xl border border-indigo-200 bg-white px-4 py-2.5 text-sm font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50" (click)="toggleEditMode()">
+            {{ !memberService.isEditModeEnabled() ? 'Edit profile' : 'Cancel editing' }}
+          </button>
+        }
+      </div>
+      <div class="my-5 h-px bg-slate-100"></div>
+      <router-outlet></router-outlet>
     </div>
-  </div>
+  </section>
 } @else {
-  <div>Member does not exist.</div>
+  <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center text-slate-500">Member does not exist.</div>
 }

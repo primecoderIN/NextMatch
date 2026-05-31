@@ -1,34 +1,25 @@
-<label
-  class="input w-full"
-  [class.input-error]="control.invalid && control.touched"
-  [class.input-success]="control.valid && control.touched"
->
-  <input [formControl]="control" [type]="type()" [placeholder]="placeholder()" />
-  <div class="tooltip">
-    <div class="tooltip-content">
-      @if (getFormControlErrorInfo(); as errorInfo) {
-        @for (error of errorInfo; track $index) {
-          <p>{{ error }}</p>
-        }
+<label class="flex w-full flex-col gap-1.5">
+  <span class="text-sm font-medium text-slate-700">{{ label() }}</span>
+  <input
+    [formControl]="control"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    class="w-full rounded-xl border bg-white px-4 py-3 text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:ring-2"
+    [class.border-rose-400]="control.invalid && control.touched"
+    [class.focus:border-rose-500]="control.invalid && control.touched"
+    [class.focus:ring-rose-100]="control.invalid && control.touched"
+    [class.border-emerald-400]="control.valid && control.touched"
+    [class.focus:border-emerald-500]="control.valid && control.touched"
+    [class.focus:ring-emerald-100]="control.valid && control.touched"
+    [class.border-slate-200]="!control.touched"
+    [class.focus:border-indigo-500]="!control.touched"
+    [class.focus:ring-indigo-100]="!control.touched"
+  />
+  @if (control.invalid && control.touched) {
+    <div class="text-xs font-medium text-rose-600">
+      @for (error of getFormControlErrorInfo(); track $index) {
+        <p>{{ error }}</p>
       }
     </div>
-    @if (control.invalid && control.touched) {
-      <button>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="size-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-          />
-        </svg>
-      </button>
-    }
-  </div>
+  }
 </label>

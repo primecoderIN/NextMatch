@@ -1,85 +1,53 @@
-<div class="card bg-base-100 w-1/2 mx-auto flex flex-col p-6 rounded-lg shadow-lg select-none">
-  <div class="card-title justify-center text-3xl text-primary">Sign up</div>
-  <p class="text-center text-sm text-gray-500 mb-4">
-    Create your account by filling in the information below.
-  </p>
-  <div class="card-body w-full">
-    <ul class="steps steps-horizontal">
-      <li class="step step-primary">Enter credentials</li>
-      <li class="step" [class.step-primary]="currentStep() === 2">Enter profile info</li>
-    </ul>
-
-    @if (currentStep() === 1) {
-      <form [formGroup]="credentialsForm" class="flex flex-col gap-4 w-full">
-
-        <app-text-input
-          formControlName="userName"
-          type="text"
-          placeholder="Username"
-          label="Username"
-        />
-
-        <app-text-input formControlName="email" type="email" placeholder="Email" label="Email" />
-
-        <app-text-input
-          formControlName="password"
-          type="password"
-          placeholder="Password"
-          label="Password"
-        />
-
-        <app-text-input
-          formControlName="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          label="Confirm Password"
-        />
-
-        <div class="flex items-center justify-between">
-          <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
-          <button
-            [disabled]="!isValidCredentialsForm"
-            type="button"
-            (click)="nextStep()"
-            class="btn btn-primary"
-          >
-            Next
-          </button>
-        </div>
-      </form>
-    }
-
-    @if (currentStep() === 2) {
-      <form
-        [formGroup]="profileForm"
-        class="flex flex-col gap-4 w-full"
-        (ngSubmit)="register()"
-      >
-        <app-text-input formControlName="gender" type="text" placeholder="Gender" label="Gender" />
-
-        <app-text-input
-          formControlName="dateOfBirth"
-          type="date"
-          placeholder="Date of Birth"
-          label="Date of Birth"
-        />
-
-        <app-text-input formControlName="city" type="text" placeholder="City" label="City" />
-
-        <app-text-input
-          formControlName="country"
-          type="text"
-          placeholder="Country"
-          label="Country"
-        />
-
-        <div class="flex items-center justify-between">
-          <button type="button" (click)="prevStep()" class="btn btn-secondary">Back</button>
-          <button [disabled]="!isValidProfileForm" type="submit" class="btn btn-primary">
-            Register
-          </button>
-        </div>
-      </form>
-    }
+<section class="mx-auto flex w-full max-w-2xl select-none flex-col rounded-3xl border border-white/15 bg-white p-6 text-slate-800 shadow-2xl shadow-slate-950/30 sm:p-8">
+  <div class="text-center">
+    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-rose-500">Join NextMatch</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create your account</h2>
+    <p class="mt-2 text-sm text-slate-500">A few details and you will be ready to start connecting.</p>
   </div>
-</div>
+
+  <div class="my-7 flex items-center">
+    <div class="flex items-center gap-2">
+      <span class="flex size-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">1</span>
+      <span class="text-sm font-semibold text-indigo-700">Credentials</span>
+    </div>
+    <div class="mx-3 h-px flex-1 bg-slate-200"></div>
+    <div class="flex items-center gap-2">
+      <span
+        class="flex size-8 items-center justify-center rounded-full text-sm font-bold"
+        [class.bg-indigo-600]="currentStep() === 2"
+        [class.text-white]="currentStep() === 2"
+        [class.bg-slate-100]="currentStep() !== 2"
+        [class.text-slate-400]="currentStep() !== 2"
+      >2</span>
+      <span class="text-sm font-semibold" [class.text-indigo-700]="currentStep() === 2" [class.text-slate-400]="currentStep() !== 2">Profile</span>
+    </div>
+  </div>
+
+  @if (currentStep() === 1) {
+    <form [formGroup]="credentialsForm" class="flex w-full flex-col gap-4">
+      <app-text-input formControlName="userName" type="text" placeholder="Username" label="Username" />
+      <app-text-input formControlName="email" type="email" placeholder="Email" label="Email" />
+      <app-text-input formControlName="password" type="password" placeholder="Password" label="Password" />
+      <app-text-input formControlName="confirmPassword" type="password" placeholder="Confirm password" label="Confirm password" />
+
+      <div class="mt-2 flex items-center justify-between">
+        <button type="button" (click)="cancel()" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Cancel</button>
+        <button [disabled]="!isValidCredentialsForm" type="button" (click)="nextStep()" class="rounded-xl bg-indigo-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">Continue</button>
+      </div>
+    </form>
+  }
+
+  @if (currentStep() === 2) {
+    <form [formGroup]="profileForm" class="flex w-full flex-col gap-4" (ngSubmit)="register()">
+      <app-text-input formControlName="gender" type="text" placeholder="Gender" label="Gender" />
+      <app-text-input formControlName="dateOfBirth" type="date" placeholder="Date of birth" label="Date of birth" />
+      <app-text-input formControlName="city" type="text" placeholder="City" label="City" />
+      <app-text-input formControlName="country" type="text" placeholder="Country" label="Country" />
+
+      <div class="mt-2 flex items-center justify-between">
+        <button type="button" (click)="prevStep()" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Back</button>
+        <button [disabled]="!isValidProfileForm" type="submit" class="rounded-xl bg-rose-500 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50">Create account</button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,14 +1,11 @@
 <app-nav />
-<div
- [class.container]="router.url !== '/'"
- [class.mt-24]="router.url !== '/'"
+<main
+  [class.max-w-7xl]="router.url !== '/'"
   [class.mx-auto]="router.url !== '/'"
-  class="container mx-auto"
+  [class.px-4]="router.url !== '/'"
+  [class.pt-24]="router.url !== '/'"
+  [class.pb-10]="router.url !== '/'"
+  class="min-h-screen sm:px-6 lg:px-8"
 >
   <router-outlet />
-</div>
-
-
-  <!-- [class.mt-24]="router.url === '/'"
-  [class.container]="router.url !== '/'"
-  [class.mx-auto]="router.url !== '/'" -->
+</main>

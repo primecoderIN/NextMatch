@@ -1,68 +1,55 @@
-<dialog #filterModal class="modal">
-  <div class="modal-box max-w-lg">
-    <h3 class="text-lg font-bold">Select filters</h3>
-    <div class="flex justify-between w-full items-center mt-6">
-      <div class="flex flex-col w-full gap-6">
-        <label class="flex justify-between items-center">
-          <span class="font-semibold"> Select gender: </span>
-          <form class="filter">
-            <input type="reset" value="x" class="btn btn-square" />
-            <input
-              aria-label="Male"
-              type="radio"
-              class="btn"
-              [(ngModel)]="memberParams().gender"
-              name="gender"
-              value="Male"
-            />
-            <input
-              aria-label="Female"
-              type="radio"
-              class="btn"
-              [(ngModel)]="memberParams().gender"
-              name="gender"
-              value="Female"
-            />
-          </form>
-        </label>
-        <label class="flex justify-between items-center">
-          <span class="font-semibold"> Select age </span>
-          <div class="flex gap-3">
-            <input
-              type="number"
-              class="input w-20"
-              [min]="18"
-              [(ngModel)]="memberParams().minAge"
-              name="minAge"
-              (change)="onMinAgeChange()"
-            />
-            <input
-              type="number"
-              class="input w-20"
-              [min]="memberParams().minAge || 18"
-              [(ngModel)]="memberParams().maxAge"
-              name="maxAge"
-              (change)="onMaxAgeChange()"
-            />
-          </div>
-        </label>
-        <label class="flex justify-between items-center">
-          <span class="font-semibold"> Order by: </span>
-
-          <select name="orderBy" class="select" [(ngModel)]="memberParams().orderBy">
-            <option disabled>Order by</option>
-            <option value="createdAt">Newest</option>
-            <option value="lastActive">Last active</option>
-          </select>
-        </label>
+<dialog #filterModal class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-3xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm">
+  <div class="p-6 sm:p-7">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-rose-500">Discover</p>
+        <h3 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Refine your matches</h3>
       </div>
+      <button (click)="close()" class="rounded-lg px-2 py-1 text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Close filters">x</button>
     </div>
-    <div class="modal-action">
-      <button (click)="submit()" class="btn btn-primary">Submit</button>
+
+    <div class="mt-7 flex flex-col gap-6">
+      <div>
+        <span class="text-sm font-semibold text-slate-700">Gender</span>
+        <div class="mt-2 grid grid-cols-3 gap-2">
+          <button type="button" (click)="memberParams().gender = undefined" class="rounded-xl border px-3 py-2.5 text-sm font-semibold hover:border-indigo-300 hover:bg-indigo-50" [class.border-indigo-500]="!memberParams().gender" [class.bg-indigo-50]="!memberParams().gender" [class.text-indigo-700]="!memberParams().gender" [class.border-slate-200]="memberParams().gender">Any</button>
+          <label class="cursor-pointer">
+            <input type="radio" class="peer sr-only" [(ngModel)]="memberParams().gender" name="gender" value="Male" />
+            <span class="block rounded-xl border border-slate-200 px-3 py-2.5 text-center text-sm font-semibold text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700">Male</span>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" class="peer sr-only" [(ngModel)]="memberParams().gender" name="gender" value="Female" />
+            <span class="block rounded-xl border border-slate-200 px-3 py-2.5 text-center text-sm font-semibold text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700">Female</span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <span class="text-sm font-semibold text-slate-700">Age range</span>
+        <div class="mt-2 grid grid-cols-2 gap-3">
+          <label class="flex flex-col gap-1">
+            <span class="text-xs text-slate-500">Minimum</span>
+            <input type="number" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" [min]="18" [(ngModel)]="memberParams().minAge" name="minAge" (change)="onMinAgeChange()" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="text-xs text-slate-500">Maximum</span>
+            <input type="number" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" [min]="memberParams().minAge || 18" [(ngModel)]="memberParams().maxAge" name="maxAge" (change)="onMaxAgeChange()" />
+          </label>
+        </div>
+      </div>
+
+      <label class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-slate-700">Sort results</span>
+        <select name="orderBy" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" [(ngModel)]="memberParams().orderBy">
+          <option value="createdAt">Newest members</option>
+          <option value="lastActive">Recently active</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="mt-8 flex justify-end gap-3">
+      <button (click)="close()" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+      <button (click)="submit()" class="rounded-xl bg-indigo-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-700">Apply filters</button>
     </div>
   </div>
-
-  <form method="dialog" class="modal-backdrop">
-    <button (click)="close()">Close</button>
-  </form>
 </dialog>

@@ -1,23 +1,26 @@
-<div class="flex items-center w-full gap-3 py-3">
-  <span>Items per page: </span>
-  <select class="select w-24" (change)="onPageChange(undefined, $event.target)">
+<div class="flex flex-wrap items-center gap-3 py-3 text-sm text-slate-600">
+  <span class="font-medium">Items per page</span>
+  <select
+    class="w-20 rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm text-slate-700 shadow-sm outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100"
+    (change)="onPageChange(undefined, $event.target)"
+  >
     @for (size of pageSizeOptions(); track $index) {
       <option [value]="size" [selected]="size === pageSize()">{{ size }}</option>
     }
   </select>
-  <div class="text-sm">
+  <div class="whitespace-nowrap font-medium text-slate-500">
     {{ (pageNumber() - 1) * pageSize() + 1 }} - {{ lastItemIndex() }} of {{ totalCount() }}
   </div>
   <div class="flex items-center gap-2">
     <button
-      class="btn btn-circle btn-ghost"
+      class="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 shadow-sm hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
       [disabled]="pageNumber()===1"
       (click)="onPageChange(pageNumber() - 1)"
     >
       Prev
     </button>
     <button
-      class="btn btn-circle btn-ghost"
+      class="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 shadow-sm hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
       [disabled]="lastItemIndex()===totalCount()"
       (click)="onPageChange(pageNumber() + 1)"
     >
