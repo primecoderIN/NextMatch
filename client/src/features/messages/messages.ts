@@ -17,6 +17,7 @@ import { Skeleton } from '../../shared/skeleton/skeleton';
 export class Messages implements OnInit {
   private messageService = inject(MessageService); 
   protected Container = 'Inbox';
+  protected fetchedContainer = 'Inbox';
   protected pageNumber = 1;
   protected pageSize = 10;
   protected paginatedMessages = signal<PaginatedResult<Message[]>| null>(null);
@@ -35,6 +36,7 @@ export class Messages implements OnInit {
     this.messageService.getMessages(this.Container, this.pageNumber, this.pageSize).subscribe({
       next: (response) => {
         this.paginatedMessages.set(response);
+        this.fetchedContainer = this.Container; // Update fetched container after successful load
       },
       error: (error) => {
         console.error('Error fetching messages:', error);
@@ -43,11 +45,12 @@ export class Messages implements OnInit {
   }
 
   get isInbox() {
-    return this.Container === 'Inbox';
+    return this.fetchedContainer === 'Inbox';
   }
 
   setContainer(container: string) {
     this.Container = container;
+    // this.fetchedContainer = container;
     this.pageNumber = 1; // Reset to first page when changing container
     this.loadMessages();
   }
