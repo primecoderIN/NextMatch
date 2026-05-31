@@ -58,6 +58,11 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
       );
 
+        var nullableDateTimeConverter = new ValueConverter<DateTime?, DateTime?>( //This creates a new ValueConverter that converts DateTime values to UTC when saving to the database and converts them back to DateTime with the kind set to UTC when retrieving from the database.
+       v =>v.HasValue? v.Value.ToUniversalTime() :null,
+       v => v.HasValue? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null
+      );
+
 
       foreach (var entity in modelBuilder.Model.GetEntityTypes()) //Iterates through all entity types in the model
       {
@@ -67,6 +72,9 @@ public class AppDBContext(DbContextOptions options) : DbContext(options)
             if (property.ClrType == typeof(DateTime)) //Checks if the property type is DateTime
             {
                property.SetValueConverter(dateTimeConverter); //If it is a DateTime property, it applies the dateTimeConverter to ensure that all DateTime values are stored and retrieved as UTC in the database
+            } else if (property.ClrType == typeof(DateTime?)) //Checks if the property type is nullable DateTime
+            {
+               property.SetValueConverter(nullableDateTimeConverter); //If it is a nullable DateTime property, it applies the nullableDateTimeConverter to ensure that all nullable DateTime values are stored and retrieved as UTC in the database
             }
          }
 
