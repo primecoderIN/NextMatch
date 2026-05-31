@@ -3,10 +3,12 @@ import { LikesService } from '../../core/services/likes-service';
 import { Member } from '../../types/member';
 import { RouterLink } from '@angular/router';
 import { AgePipe } from '../../core/pipe/age-pipe';
+import { BusyService } from '../../core/services/busy-service';
+import { Skeleton } from '../../shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-lists',
-  imports: [RouterLink, AgePipe],
+  imports: [RouterLink, AgePipe, Skeleton],
   templateUrl: './lists.html',
   styleUrl: './lists.css',
 })
@@ -14,6 +16,7 @@ export class Lists implements OnInit {
   private likeService = inject(LikesService);
   protected members = signal<Member[]>([]);
   protected predicate = 'liked';
+  protected busyService = inject(BusyService);
 
 
   tabs = [

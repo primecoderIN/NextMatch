@@ -27,6 +27,8 @@
         </article>
       }
     </div>
+  } @else if (busyService.busyRequestCount() > 0) {
+    <app-skeleton layout="grid" [count]="8" [columns]="4"></app-skeleton>
   } @else {
     <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
       <h2 class="text-xl font-semibold text-slate-800">No connections here yet</h2>

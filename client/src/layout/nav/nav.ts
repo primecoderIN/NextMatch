@@ -5,10 +5,11 @@ import { LoginCredentials } from '../../types/user';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastService } from '../../core/services/toast-service';
 import { BusyService } from '../../core/services/busy-service';
+import { BarLoader } from '../../shared/bar-loader/bar-loader';
 
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, RouterLink, RouterLinkActive],
+  imports: [FormsModule, RouterLink, RouterLinkActive, BarLoader],
   templateUrl: './nav.html',
   styleUrl: './nav.css',
 })

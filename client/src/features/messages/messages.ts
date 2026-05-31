@@ -5,10 +5,12 @@ import { PaginatedResult } from '../../types/pagination';
 import { Paginator } from "../../shared/paginator/paginator";
 import { RouterLink } from '@angular/router';
 import { TimeAgoPipe } from '../../core/pipe/time-ago-pipe';
+import { BusyService } from '../../core/services/busy-service';
+import { Skeleton } from '../../shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-messages',
-  imports: [Paginator, RouterLink, TimeAgoPipe],
+  imports: [Paginator, RouterLink, TimeAgoPipe, Skeleton],
   templateUrl: './messages.html',
   styleUrl: './messages.css',
 })
@@ -18,6 +20,7 @@ export class Messages implements OnInit {
   protected pageNumber = 1;
   protected pageSize = 10;
   protected paginatedMessages = signal<PaginatedResult<Message[]>| null>(null);
+  protected busyService = inject(BusyService);
 
   tabs = [
     { label: 'Inbox', value: 'Inbox' },

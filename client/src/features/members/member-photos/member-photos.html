@@ -1,4 +1,7 @@
 @if (!memberService.isEditModeEnabled()) {
+  @if (photos().length === 0 && busyService.busyRequestCount() > 0) {
+    <app-skeleton layout="photos" [count]="8" [columns]="4"></app-skeleton>
+  }
   @if (photos(); as photos) {
     @if (photos.length > 0) {
       <div class="grid auto-rows-min grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -25,6 +28,8 @@
           </div>
         }
       </div>
+    } @else if (busyService.busyRequestCount() > 0) {
+      <app-skeleton layout="photos" [count]="8" [columns]="4"></app-skeleton>
     } @else {
       <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
         <h3 class="text-lg font-semibold text-slate-800">No photos available</h3>

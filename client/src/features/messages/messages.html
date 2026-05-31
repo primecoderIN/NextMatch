@@ -20,6 +20,10 @@
     </div>
   </div>
 
+  @if (!paginatedMessages()?.items && busyService.busyRequestCount() > 0) {
+    <app-skeleton layout="list" [count]="5"></app-skeleton>
+  }
+
   @if (paginatedMessages()?.items; as messages) {
     @if (messages.length > 0) {
       <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -41,6 +45,8 @@
           </a>
         }
       </div>
+    } @else if (busyService.busyRequestCount() > 0) {
+      <app-skeleton layout="list" [count]="5"></app-skeleton>
     } @else {
       <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
         <h2 class="text-xl font-semibold text-slate-800">No messages found</h2>

@@ -8,17 +8,19 @@ import {
   ViewChild,
 } from '@angular/core';
 import { EditableMember, Member } from '../../../types/member';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MemberService } from '../../../core/services/member-service';
+import { BusyService } from '../../../core/services/busy-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastService } from '../../../core/services/toast-service';
 import { AccountService } from '../../../core/services/account-service';
 import { TimeAgoPipe } from '../../../core/pipe/time-ago-pipe';
+import { Skeleton } from '../../../shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-member-profile',
-  imports: [DatePipe, FormsModule, TimeAgoPipe],
+  imports: [CommonModule, DatePipe, FormsModule, TimeAgoPipe],
   templateUrl: './member-profile.html',
   styleUrl: './member-profile.css',
 })
@@ -34,6 +36,8 @@ export class MemberProfile implements OnInit, OnDestroy {
   protected accountService = inject(AccountService);
   protected toast = inject(ToastService);
   protected memberService = inject(MemberService);
+  protected busyService = inject(BusyService);
+  protected skeleton = Skeleton;
   private destroyRef = inject(DestroyRef);
   protected memberEditData: EditableMember = {
     userName: '',

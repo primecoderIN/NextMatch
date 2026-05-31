@@ -1,0 +1,42 @@
+<div *ngIf="isLoading" class="skeleton-root">
+  <ng-container [ngSwitch]="layout">
+    <div *ngSwitchCase="'grid'" class="skeleton-grid" [style.gridTemplateColumns]="'repeat(' + columns + ', minmax(0, 1fr))'">
+      <div *ngFor="let item of items" class="skeleton-card">
+        <div class="skeleton-shimmer skeleton-image"></div>
+        <div class="skeleton-card-body">
+          <div class="skeleton-shimmer skeleton-title"></div>
+          <div class="skeleton-shimmer skeleton-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'profile'" class="skeleton-profile">
+      <div class="skeleton-profile-sidebar">
+        <div class="skeleton-shimmer skeleton-avatar"></div>
+        <div class="skeleton-shimmer skeleton-title"></div>
+        <div class="skeleton-shimmer skeleton-subtitle"></div>
+      </div>
+      <div class="skeleton-profile-main">
+        <div class="skeleton-shimmer skeleton-title"></div>
+        <div class="skeleton-shimmer skeleton-text"></div>
+        <div class="skeleton-shimmer skeleton-text"></div>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'photos'" class="skeleton-grid" [style.gridTemplateColumns]="'repeat(' + columns + ', minmax(0, 1fr))'">
+      <div *ngFor="let item of items" class="skeleton-photo-card">
+        <div class="skeleton-shimmer skeleton-photo"></div>
+      </div>
+    </div>
+
+    <div *ngSwitchDefault class="skeleton-list">
+      <div *ngFor="let item of items" class="skeleton-list-item">
+        <div class="skeleton-shimmer skeleton-avatar-sm"></div>
+        <div class="skeleton-lines">
+          <div class="skeleton-shimmer skeleton-line"></div>
+          <div class="skeleton-shimmer skeleton-line short"></div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -6,10 +6,12 @@ import { PaginatedResult } from '../../../types/pagination';
 import { Paginator } from '../../../shared/paginator/paginator';
 import { FilterModal } from '../filter-modal/filter-modal';
 import { LikesService } from '../../../core/services/likes-service';
+import { BusyService } from '../../../core/services/busy-service';
+import { Skeleton } from '../../../shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-member-list',
-  imports: [MemberCard, Paginator, FilterModal],
+  imports: [MemberCard, Paginator, FilterModal, Skeleton],
   templateUrl: './member-list.html',
   styleUrl: './member-list.css',
 })
@@ -20,6 +22,7 @@ export class MemberList implements OnInit {
   protected memberParams = new MemberParams();
   protected appliedFilters = new MemberParams();
   protected likesService = inject(LikesService);
+  protected busyService = inject(BusyService);
 
   constructor() {
     const filters = localStorage.getItem("filters");

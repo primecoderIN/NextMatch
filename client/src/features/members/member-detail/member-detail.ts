@@ -15,16 +15,19 @@ import { AgePipe } from '../../../core/pipe/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
 import { MemberService } from '../../../core/services/member-service';
 import { LikesService } from '../../../core/services/likes-service';
+import { BusyService } from '../../../core/services/busy-service';
+import { Skeleton } from '../../../shared/skeleton/skeleton';
 import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-member-detail',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet,AgePipe],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, AgePipe, Skeleton],
   templateUrl: './member-detail.html',
   styleUrl: './member-detail.css',
 })
 export class MemberDetail implements OnInit {
   protected memberService = inject(MemberService);
+  protected busyService = inject(BusyService);
   private accountService = inject(AccountService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);

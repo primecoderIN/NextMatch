@@ -4,17 +4,20 @@ import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../../types/member';
 import { ImageUpload } from '../../../shared/image-upload/image-upload';
 import { AccountService } from '../../../core/services/account-service';
+import { BusyService } from '../../../core/services/busy-service';
+import { Skeleton } from '../../../shared/skeleton/skeleton';
 import { User } from '../../../types/user';
 
 @Component({
   selector: 'app-member-photos',
-  imports: [ImageUpload],
+  imports: [ImageUpload, Skeleton],
   templateUrl: './member-photos.html',
   styleUrl: './member-photos.css',
 })
 export class MemberPhotos implements OnInit {
   protected memberService = inject(MemberService);
   protected accountService = inject(AccountService);
+  protected busyService = inject(BusyService);
   private route = inject(ActivatedRoute);
   protected photos = signal<Photo[]>([]);
   protected isLoading = signal<boolean>(false);
