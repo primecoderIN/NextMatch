@@ -22,14 +22,18 @@ export class MemberPhotos implements OnInit {
 
   @Input() id?: string;
 
+  private memberId = computed(() => this.id ?? this.memberService.member()?.id);
+
   protected isCurrentUserPhotos = computed(() => {
     const currentUserId = this.accountService.currentUser()?.id;
-    return currentUserId !== undefined && this.id !== undefined && currentUserId === this.id;
+    const id = this.memberId();
+    return currentUserId !== undefined && id !== undefined && currentUserId === id;
   });
 
   ngOnInit(): void {
-    if (this.id) {
-      this.memberService.getMemberPhotos(this.id).subscribe({
+    const id = this.memberId();
+    if (id) {
+      this.memberService.getMemberPhotos(id).subscribe({
         next: (photos) => {
           this.photos.set(photos);
         },
