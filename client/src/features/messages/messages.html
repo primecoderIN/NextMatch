@@ -1,7 +1,7 @@
-<div class="flex flex-col w-full">
-  <div class="flex justify-between items-center">
+<div class="flex w-full flex-col gap-4">
+  <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div class="tabs tabs-box tabs-lg text-primary w-fit">
-      @for (tab of tabs; track $index) {
+      @for (tab of tabs; track tab.value) {
         <button
           role="tab"
           class="tab"
@@ -12,21 +12,70 @@
         </button>
       }
     </div>
-          @if (paginatedMessages()?.metaData; as metaData) {
-        <app-paginator
-          [pageNumber]="metaData.currentPage"
-          [pageSize]="metaData.pageSize"
-          [totalCount]="metaData.totalCount"
-          (pageChange)="onPageChange($event)"
-        >
-        </app-paginator>
+
+    @if (paginatedMessages()?.metaData; as metaData) {
+      @if (metaData.totalCount > 0) {
+      <app-paginator
+        [pageNumber]="metaData.currentPage"
+        [pageSize]="metaData.pageSize"
+        [totalCount]="metaData.totalCount"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-paginator>
       }
+    }
   </div>
+
+  @if (paginatedMessages()?.items; as messages) {
+    @if (messages.length > 0) {
+      <div class="overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-sm">
+        @for (message of messages; track message.id) {
+          <a
+            [routerLink]="['/members', isInbox ? message.senderId : message.recipientId]"
+            class="flex items-center gap-4 border-b border-base-300 p-4 transition-colors last:border-b-0 hover:bg-base-200"
+          >
+            <div class="avatar">
+              <div class="h-14 w-14 rounded-full">
+                <img
+                  [src]="
+                    (isInbox ? message.senderImageUrl : message.recipientImageUrl) || '/user.png'
+                  "
+                  [alt]="isInbox ? message.senderUsername : message.recipientUsername"
+                />
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="truncate font-semibold">
+                  {{ isInbox ? message.senderUsername : message.recipientUsername }}
+                </span>
+                @if (isInbox && !message.dateRead) {
+                  <span class="badge badge-primary badge-sm">New</span>
+                }
+              </div>
+              <p class="truncate text-sm text-base-content/70">{{ message.content }}</p>
+            </div>
+
+            @if (message.messageSent) {
+              <span class="hidden whitespace-nowrap text-sm text-base-content/60 sm:block">
+                {{ message.messageSent | timeAgo }}
+              </span>
+            }
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="hero min-h-64 rounded-box border border-dashed border-base-300 bg-base-100">
+        <div class="hero-content text-center">
+          <div>
+            <h2 class="text-xl font-semibold">No messages found</h2>
+            <p class="mt-1 text-base-content/60">
+              Your {{ isInbox ? 'inbox' : 'outbox' }} is empty.
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+  }
 </div>
-
-
-@for(message of paginatedMessages()?.items || []; track message.id) {
-  <div class="message-item">
-    <h3>{{ message.content }}</h3>
-  </div>
-}

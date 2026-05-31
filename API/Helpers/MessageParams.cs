@@ -3,5 +3,5 @@ public class MessageParams :PaginationParams
 {
     public string? MemberId { get; set; }
 
-    public string Containter { get; set; } = "Inbox";
+    public string Container { get; set; } = "Inbox";
 }

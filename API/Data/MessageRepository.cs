@@ -27,7 +27,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
     {
          var query = context.Messages.OrderByDescending(x=> x.MessageSent).AsQueryable(); //get the last message first 
 
-         query= messageParams.Containter switch
+         query= messageParams.Container switch
          {
              "Outbox" => query.Where(x=> x.SenderId==messageParams.MemberId),
              _ => query.Where(x=> x.RecipientId==messageParams.MemberId)

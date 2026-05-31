@@ -1,12 +1,12 @@
 export type Message  ={
   id: string
   senderId: string
-  senderDisplayName: string
-  senderImageUrl: string
+  senderUsername: string
+  senderImageUrl?: string | null
   recipientId: string
-  recipientDisplayName: string
-  recipientImageUrl: string
+  recipientUsername: string
+  recipientImageUrl?: string | null
   content: string
-  dateRead: string
-  messageSent: string
+  dateRead?: string | null
+  messageSent?: string | null
 }

@@ -3,10 +3,12 @@ import { MessageService } from '../../core/services/message-service';
 import { Message } from '../../types/message';
 import { PaginatedResult } from '../../types/pagination';
 import { Paginator } from "../../shared/paginator/paginator";
+import { RouterLink } from '@angular/router';
+import { TimeAgoPipe } from '../../core/pipe/time-ago-pipe';
 
 @Component({
   selector: 'app-messages',
-  imports: [Paginator],
+  imports: [Paginator, RouterLink, TimeAgoPipe],
   templateUrl: './messages.html',
   styleUrl: './messages.css',
 })
