@@ -14,6 +14,8 @@ import { Member } from '../../../types/member';
 import { AgePipe } from '../../../core/pipe/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
 import { MemberService } from '../../../core/services/member-service';
+import { LikesService } from '../../../core/services/likes-service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-member-detail',
@@ -26,6 +28,8 @@ export class MemberDetail implements OnInit {
   private accountService = inject(AccountService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
+  private likesService = inject(LikesService);
   // protected member$!: Observable<Member>;
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
 
@@ -50,6 +54,26 @@ export class MemberDetail implements OnInit {
 
   toggleEditMode(): void {
     this.memberService.isEditModeEnabled.set(!this.memberService.isEditModeEnabled());
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  toggleLike(memberId: string): void {
+    this.likesService.toggleLike(memberId).subscribe({
+      next: () => {
+        if (this.hasLiked(memberId)) {
+          this.likesService.likeIds.set(this.likesService.likeIds().filter((id) => id !== memberId));
+        } else {
+          this.likesService.likeIds.set([...this.likesService.likeIds(), memberId]);
+        }
+      },
+    });
+  }
+
+  hasLiked(memberId: string): boolean {
+    return this.likesService.likeIds().includes(memberId);
   }
 
   // getMemberData() {
