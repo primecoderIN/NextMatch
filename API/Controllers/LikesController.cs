@@ -64,6 +64,7 @@ public class LikesController(ILikesRepository likesRepository) : BaseController
 
         if (currentMemberId == null) return Unauthorized();
 
+        likeParams.MemberId = currentMemberId;
         var members = await likesRepository.GetMemberLikes(likeParams);
 
         return Ok(members);

@@ -2,6 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Member } from '../../types/member';
+import { PaginatedResult } from '../../types/pagination';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,9 @@ export class LikesService {
   }
 
   getLikes(predicate: string) {
-    return this.http.get<Member[]>(this.baseUrl + `likes?predicate=` + predicate, {});
+    return this.http
+      .get<PaginatedResult<Member[]>>(this.baseUrl + `likes?predicate=` + predicate)
+      .pipe(map((response) => response.items));
   }
 
   getLikeIds() {
