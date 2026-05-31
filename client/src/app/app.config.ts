@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners,provideZonelessChangeDetection } from '@angular/core';
 
-import { provideRouter, withViewTransitions } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from '../core/interceptors/error-interceptor';
@@ -11,7 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),//Enables zoneless change detection for improved performance
-    provideRouter(routes, withViewTransitions()), //Enables router with view transitions
+    provideRouter(routes, withComponentInputBinding(), withViewTransitions()), //Enables router with view transitions and route input binding
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor, loadingInterceptor])), //Enables HttpClient throughout the app and activats interceptor
   ],
 };

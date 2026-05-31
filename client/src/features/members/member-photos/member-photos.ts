@@ -1,6 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { MemberService } from '../../../core/services/member-service';
-import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../../types/member';
 import { ImageUpload } from '../../../shared/image-upload/image-upload';
 import { AccountService } from '../../../core/services/account-service';
@@ -18,21 +17,19 @@ export class MemberPhotos implements OnInit {
   protected memberService = inject(MemberService);
   protected accountService = inject(AccountService);
   protected busyService = inject(BusyService);
-  private route = inject(ActivatedRoute);
   protected photos = signal<Photo[]>([]);
   protected isLoading = signal<boolean>(false);
 
+  @Input() id?: string;
+
   protected isCurrentUserPhotos = computed(() => {
     const currentUserId = this.accountService.currentUser()?.id;
-    const profileId = this.route.parent?.snapshot.paramMap.get('id');
-    return currentUserId !== undefined && profileId !== null && currentUserId === profileId;
+    return currentUserId !== undefined && this.id !== undefined && currentUserId === this.id;
   });
 
   ngOnInit(): void {
-    const memberId = this.route.parent?.snapshot.paramMap.get('id');
-
-    if (memberId) {
-      this.memberService.getMemberPhotos(memberId).subscribe({
+    if (this.id) {
+      this.memberService.getMemberPhotos(this.id).subscribe({
         next: (photos) => {
           this.photos.set(photos);
         },

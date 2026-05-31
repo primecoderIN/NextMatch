@@ -1,7 +1,6 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 // import { MemberService } from '../../../core/services/member-service';
 import {
-  ActivatedRoute,
   NavigationEnd,
   Router,
   RouterLink,
@@ -29,17 +28,17 @@ export class MemberDetail implements OnInit {
   protected memberService = inject(MemberService);
   protected busyService = inject(BusyService);
   private accountService = inject(AccountService);
-  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
   private likesService = inject(LikesService);
   // protected member$!: Observable<Member>;
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
 
+  @Input() id?: string;
 
-  protected isCurrentUser = computed(()=> {
-    return this.accountService?.currentUser()?.id===this.route.snapshot.paramMap.get('id');
-  })
+  protected isCurrentUser = computed(() => {
+    return this.accountService?.currentUser()?.id === this.id;
+  });
 
   ngOnInit(): void {
     // this.member$ = this.getMemberData(); using route resolver so commented this
@@ -78,14 +77,4 @@ export class MemberDetail implements OnInit {
   hasLiked(memberId: string): boolean {
     return this.likesService.likeIds().includes(memberId);
   }
-
-  // getMemberData() {
-  //   const id = this.route.snapshot.paramMap.get('id');
-
-  //   if (!id) {
-  //     throw new Error('Member id is missing');
-  //   }
-
-  //   return this.memberService.getMemberById(id);
-  // }
 }
