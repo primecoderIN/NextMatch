@@ -22,9 +22,20 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         return await context.Messages.FindAsync(messageId);
     }
 
-    public async Task<PaginatedResult<MessageDTO>> GetMessagesForMember()
+    public async Task<PaginatedResult<MessageDTO>> GetMessagesForMember(MessageParams messageParams)
     {
-        throw new NotImplementedException();
+         var query = context.Messages.OrderByDescending(x=> x.MessageSent).AsQueryable(); //get the last message first 
+
+         query= messageParams.Containter switch
+         {
+             "Outbox" => query.Where(x=> x.SenderId==messageParams.MemberId),
+             _ => query.Where(x=> x.RecipientId==messageParams.MemberId)
+         };
+
+         var messageQuery = query.Select(MessageExtension.ToDTOProjection());
+
+         return await PaginationHelper<MessageDTO>.CreateAsync(messageQuery, messageParams.PageNumber, messageParams.PageSize);
+         
     }
 
     public async Task<IReadOnlyList<MessageDTO>> GetMessageThread(string currentMemberId, string recipientMemberId)

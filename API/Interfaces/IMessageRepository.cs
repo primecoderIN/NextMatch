@@ -10,7 +10,7 @@ namespace API.Interfaces
         void DeleteMessage(Message message);
 
         Task<Message?> GetMessage(int messageId);
-        Task<PaginatedResult<MessageDTO>> GetMessagesForMember();
+        Task<PaginatedResult<MessageDTO>> GetMessagesForMember(MessageParams messageParams);
 
         Task<IReadOnlyList<MessageDTO>> GetMessageThread(string currentMemberId, string recipientMemberId);
 

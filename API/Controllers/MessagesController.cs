@@ -3,6 +3,7 @@ using API.Controllers;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,13 @@ public class MessagesController(IMessageRepository messageRepository, IMemberRep
         {
             return BadRequest("Message can not be sent");
         }
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<PaginatedResult<MessageDTO>>> GetMessagesByContainer ([FromQuery] MessageParams messageParams)
+    {
+        messageParams.MemberId = User.GetMemberId();
+        return await messageRepository.GetMessagesForMember(messageParams);
     }
 
 }
