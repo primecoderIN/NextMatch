@@ -25,7 +25,9 @@ public class MessagesController(IMessageRepository messageRepository, IMemberRep
         {
             SenderId = sender.Id,
             RecipientId = receipent.Id,
-            Content = createMessageDTO.Content
+            Content = createMessageDTO.Content,
+            Sender = sender, //Manually assigning sender and recipient to avoid null reference error when converting to DTO
+            Recipient = receipent
         };
 
         messageRepository.AddMessage(message);
