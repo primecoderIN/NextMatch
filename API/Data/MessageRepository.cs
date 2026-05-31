@@ -10,7 +10,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
 {
     public void AddMessage(Message message)
     {
-       context.Messages.AddAsync(message);
+       context.Messages.Add(message);
     }
 
     public void DeleteMessage(Message message)
@@ -27,9 +27,9 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
     {
          var query = context.Messages.OrderByDescending(x=> x.MessageSent).AsQueryable(); //get the last message first 
 
-         query= messageParams.Container switch
+         query = messageParams.Container.ToLowerInvariant() switch
          {
-             "Outbox" => query.Where(x=> x.SenderId==messageParams.MemberId),
+             "outbox" => query.Where(x=> x.SenderId==messageParams.MemberId),
              _ => query.Where(x=> x.RecipientId==messageParams.MemberId)
          };
 

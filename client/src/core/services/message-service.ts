@@ -8,7 +8,7 @@ import { Message } from '../../types/message';
   providedIn: 'root',
 })
 export class MessageService {
-  private baseUrl = environment.apiUrl + 'messages/';
+  private baseUrl = environment.apiUrl + 'messages';
   private http = inject(HttpClient);
 
   getMessages(container: string, pageNumber: number, pageSize: number) {
@@ -20,6 +20,10 @@ export class MessageService {
   }
 
   getMessageThread(memberId: string) {
-    return this.http.get<Message[]>(this.baseUrl + 'thread/' + memberId);
+    return this.http.get<Message[]>(this.baseUrl + '/thread/' + memberId);
+  }
+
+  addMessageToThread(memberId: string, content: string) {
+    return this.http.post<Message>(this.baseUrl, { recipientId: memberId, content });
   }
 }

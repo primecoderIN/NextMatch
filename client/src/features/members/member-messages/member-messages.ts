@@ -40,25 +40,37 @@ export class MemberMessages implements OnInit {
    }
 
    sendMessage() {
-    const content = this.newMessage();
-    if (!content || !content.trim()) return;
-    // For now just append locally for UI responsiveness. Backend send endpoint not implemented here.
+    const content = this.newMessage().trim();
+    if (!content) return;
+
     const user = this.accountService.currentUser();
     const other = this.memberService.member();
+    if (!other) return;
+
     const temp: Message = {
       id: Math.random().toString(36).slice(2),
       senderId: user?.id || 'me',
       senderUsername: user?.userName || 'You',
       senderImageUrl: user?.imageUrl || null,
-      recipientId: other?.id || '',
-      recipientUsername: other?.userName || '',
-      recipientImageUrl: other?.imageUrl || null,
+      recipientId: other.id,
+      recipientUsername: other.userName,
+      recipientImageUrl: other.imageUrl || null,
       content: content,
       messageSent: new Date().toISOString(),
     };
 
     this.messageThread.update((m) => [...m, temp]);
     this.newMessage.set('');
+    this.messageService.addMessageToThread(other.id, content).subscribe({
+      next: (message) => {
+        this.messageThread.update((m) => m.map((item) => item.id === temp.id ? message : item));
+      },
+      error: (error) => {
+        this.messageThread.update((m) => m.filter((item) => item.id !== temp.id));
+        if (!this.newMessage()) this.newMessage.set(content);
+        console.error('Error sending message:', error);
+      }
+    });
     setTimeout(() => this.scrollToBottom(), 30);
    }
 
