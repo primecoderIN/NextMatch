@@ -1,1 +1,32 @@
-<p>messages works!</p>
+<div class="flex flex-col w-full">
+  <div class="flex justify-between items-center">
+    <div class="tabs tabs-box tabs-lg text-primary w-fit">
+      @for (tab of tabs; track $index) {
+        <button
+          role="tab"
+          class="tab"
+          [class.tab-active]="Container === tab.value"
+          (click)="setContainer(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+          @if (paginatedMessages()?.metaData; as metaData) {
+        <app-paginator
+          [pageNumber]="metaData.currentPage"
+          [pageSize]="metaData.pageSize"
+          [totalCount]="metaData.totalCount"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-paginator>
+      }
+  </div>
+</div>
+
+
+@for(message of paginatedMessages()?.items || []; track message.id) {
+  <div class="message-item">
+    <h3>{{ message.content }}</h3>
+  </div>
+}

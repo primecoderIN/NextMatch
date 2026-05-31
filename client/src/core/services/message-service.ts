@@ -12,10 +12,10 @@ export class MessageService {
   private http = inject(HttpClient);
 
   getMessages(container: string, pageNumber: number, pageSize: number) {
-      let params = new HttpParams();
-      params.append('pageNumber', pageNumber.toString());
-      params.append('pageSize', pageSize.toString());
-      params.append('container', container);
-    return this.http.get<PaginatedResult<Message>>(this.baseUrl, { params });
+  const params = new HttpParams()
+  .append('pageNumber', pageNumber)
+  .append('pageSize', pageSize)
+  .append('container', container);
+    return this.http.get<PaginatedResult<Message[]>>(this.baseUrl, { params });
   }
 }
