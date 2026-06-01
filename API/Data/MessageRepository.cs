@@ -45,7 +45,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         .ExecuteUpdateAsync(x=> x.SetProperty(m=> m.DateRead, DateTime.UtcNow));
 
         return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.SenderDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.RecipientDeleted==false))
-        .OrderByDescending(x=> x.MessageSent)
+        .OrderBy(x=> x.MessageSent)
         .Select(MessageExtension.ToDTOProjection())
         .ToListAsync();
     }
