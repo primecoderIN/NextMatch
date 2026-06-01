@@ -26,4 +26,8 @@ export class MessageService {
   addMessageToThread(memberId: string, content: string) {
     return this.http.post<Message>(this.baseUrl, { recipientId: memberId, content });
   }
+
+  deleteMessageById(id: string) {
+    return this.http.delete<void>(this.baseUrl + '/' + id);
+  }
 }
