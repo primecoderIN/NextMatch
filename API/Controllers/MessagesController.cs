@@ -57,4 +57,48 @@ public class MessagesController(IMessageRepository messageRepository, IMemberRep
         return Ok(await messageRepository.GetMessageThread(currentMemberId, recipientId));
     }
 
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteMessage(string id)
+    {
+        var currentMemberId = User.GetMemberId();
+
+        var currentMessage =await messageRepository.GetMessageById(id);
+
+        if(currentMessage==null)
+        {
+            return NotFound();
+        }
+
+        if(currentMemberId!= currentMessage.SenderId && currentMemberId != currentMessage.RecipientId)
+        {
+            return Unauthorized();
+        }
+
+        if(currentMemberId==currentMessage.SenderId)
+        {
+            currentMessage.SenderDeleted=true;
+        } 
+
+        if(currentMemberId==currentMessage.RecipientId)  
+        {
+            currentMessage.RecipientDeleted=true;
+        }
+
+        if(currentMessage is {SenderDeleted:true, RecipientDeleted:true})
+        {
+            messageRepository.DeleteMessage(currentMessage);
+        }
+
+        if(await memberRepository.SaveAllAsync())
+        {
+            return Ok();
+        }
+
+        return BadRequest("Problem deleting the message");
+       
+
+    }
+
+
+
 }

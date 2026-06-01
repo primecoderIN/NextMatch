@@ -18,7 +18,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
        context.Messages.Remove(message);
     }
 
-    public async Task<Message?> GetMessage(int messageId)
+    public async Task<Message?> GetMessageById(string messageId)
     {
         return await context.Messages.FindAsync(messageId);
     }
@@ -29,8 +29,8 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
 
          query = messageParams.Container.ToLowerInvariant() switch
          {
-             "outbox" => query.Where(x=> x.SenderId==messageParams.MemberId),
-             _ => query.Where(x=> x.RecipientId==messageParams.MemberId)
+             "outbox" => query.Where(x=> x.SenderId==messageParams.MemberId && x.SenderDeleted==false),
+             _ => query.Where(x=> x.RecipientId==messageParams.MemberId && x.RecipientDeleted==false)
          };
 
          var messageQuery = query.Select(MessageExtension.ToDTOProjection());
@@ -44,7 +44,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         await context.Messages.Where(x=> x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.DateRead==null)
         .ExecuteUpdateAsync(x=> x.SetProperty(m=> m.DateRead, DateTime.UtcNow));
 
-        return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId))
+        return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.SenderDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.RecipientDeleted==false))
         .OrderByDescending(x=> x.MessageSent)
         .Select(MessageExtension.ToDTOProjection())
         .ToListAsync();
