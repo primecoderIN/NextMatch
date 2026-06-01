@@ -44,7 +44,7 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         await context.Messages.Where(x=> x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.DateRead==null)
         .ExecuteUpdateAsync(x=> x.SetProperty(m=> m.DateRead, DateTime.UtcNow));
 
-        return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.SenderDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.RecipientDeleted==false))
+        return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.RecipientDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.SenderDeleted==false))
         .OrderBy(x=> x.MessageSent)
         .Select(MessageExtension.ToDTOProjection())
         .ToListAsync();
