@@ -1,14 +1,14 @@
 
 using API.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
 //Using inline constructors C#12(Primary constructor) for simpler dependency injection
-public class AppDBContext(DbContextOptions options) : DbContext(options)
+public class AppDBContext(DbContextOptions options) : IdentityDbContext<AppUser>(options) //This tells the IdentityDbContext to use our custom AppUser class as the user entity for identity management, allowing us to integrate ASP.NET Core Identity features with our application's user data model.
 {
-   public DbSet<AppUser> Users { get; set; }
 
    public DbSet<Member> Members { get; set; }
 

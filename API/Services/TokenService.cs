@@ -21,9 +21,9 @@ public class TokenService(IConfiguration config) : ITokenService //IConfiguratio
 
         var claims = new List<Claim> //Claims are used to store information about the user that is included in the JWT token. In this case, we are adding claims for the user's email, unique identifier (Id), and username. These claims can be accessed by the server when the token is received in subsequent requests, allowing us to identify the user and perform authorization checks based on their identity and roles. By including these claims in the token, we can ensure that the necessary information about the user is available for authentication and authorization purposes throughout the application.
         {
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Email, user.Email!),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName)
+            new Claim(ClaimTypes.Name, user.UserName!)
         };
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature); //SigningCredentials are used to specify the security key and algorithm that will be used to sign the JWT token. In this case, we are using the symmetric security key that we created earlier and the HMAC SHA-512 algorithm for signing. This ensures that the token is securely signed and can be validated by the server when it is received in subsequent requests. By using strong signing credentials, we can help protect against tampering and ensure the integrity of the tokens used for user authentication.

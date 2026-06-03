@@ -10,8 +10,8 @@ namespace API.Extensions
             return new UserDTO
             {
                 Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName!,
+                Email = user.Email!,
                 Token = tokenService.CreateToken(user),
                 ImageUrl= user.ImageUrl
             };

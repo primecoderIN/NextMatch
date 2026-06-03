@@ -2,7 +2,9 @@ using API.Data;
 using API.Interfaces;
 using API.Services;
 using API.Middlewares;
+using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -33,6 +35,14 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+
+//ASP.NET Core Identity configuration
+builder.Services.AddIdentityCore<AppUser>(opt=> {
+    opt.Password.RequireNonAlphanumeric = false;
+    opt.User.RequireUniqueEmail = true;
+}) 
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<AppDBContext>();
 
 /* =======================
    Authentication (JWT)
@@ -165,8 +175,10 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDBContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await context.Database.MigrateAsync(); //Asynchronously applies pending migrations and creates the database if it does not already exist. This is a convenient way to ensure that the database schema is up to date with the latest migrations when the application starts. By calling this method, we can automatically apply any new migrations that have been added since the last time the application was run, which helps to keep the database schema in sync with the application's data model and ensures that any changes to the data model are properly reflected in the database.
-    await Seed.SeedUsers(context);
+    await Seed.SeedUsers(context, userManager, roleManager);
 }
 catch (Exception ex)
 {
