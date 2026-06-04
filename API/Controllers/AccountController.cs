@@ -1,8 +1,6 @@
-using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using API.DTOs;
 using API.Interfaces;
 using API.Extensions; //To use AsUserDTO extension method
@@ -10,22 +8,13 @@ using API.Extensions; //To use AsUserDTO extension method
 namespace API.Controllers
 {
 
-    public class AccountController(AppDBContext DbContext, ITokenService tokenService, UserManager<AppUser> userManager) : BaseController
+    public class AccountController(ITokenService tokenService, UserManager<AppUser> userManager) : BaseController
     {
         [HttpPost("register")] // localhost:5001/api/account/register
 
         //When we mention string the controller will look it into query params by default RegisterUser(string userName,  string email,string password) so not using here
         public async Task<ActionResult<UserDTO>> RegisterUser([FromBody] RegisterDTO registerDTO) //Task is used with async await to wait for the task to be completed
         {
-
-            if (await UserExists(registerDTO.UserName))
-            {
-                return BadRequest("Username is already taken");
-            }
-            if (await EmailExists(registerDTO.Email))
-            {
-                return BadRequest("Email is already registered");
-            }
 
             var newUser = new AppUser
             {
@@ -49,20 +38,21 @@ namespace API.Controllers
                 // Return errors from Identity
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 return BadRequest($"Registration failed: {errors}");
+
+                //Another way to return errors
+
+                // foreach (var error in result.Errors)
+                // {
+                //     ModelState.AddModelError(error.Code, error.Description);
+                // }
+
+                // return ValidationProblem();
             }
 
             return newUser.AsUserDTO(tokenService);
         }
 
-        private async Task<bool> UserExists(string userName)
-        {
-            return await DbContext.Users.AnyAsync(u => u.UserName!.ToLower() == userName.ToLower());
-        }
-
-        private async Task<bool> EmailExists(string email)
-        {
-            return await DbContext.Users.AnyAsync(u => u.Email!.ToLower() == email.ToLower());
-        }
+      
 
         [HttpPost("login")]  //localhost:5001/api/member/login
         public async Task<ActionResult<UserDTO>> LoginUser([FromBody] LoginDTO loginDTO)
