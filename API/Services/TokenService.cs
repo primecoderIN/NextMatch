@@ -4,12 +4,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Services;
 
-public class TokenService(IConfiguration config) : ITokenService //IConfiguration is used to access the configuration settings in the appsettings.json file, specifically to retrieve the TokenKey value that is used to sign the JWT tokens. By injecting IConfiguration into the TokenService constructor, we can easily access the configuration settings and use them to generate secure tokens for user authentication.
+public class TokenService(IConfiguration config, UserManager<AppUser> userManager) : ITokenService //IConfiguration is used to access the configuration settings in the appsettings.json file, specifically to retrieve the TokenKey value that is used to sign the JWT tokens. By injecting IConfiguration into the TokenService constructor, we can easily access the configuration settings and use them to generate secure tokens for user authentication.
 {
-    public string CreateToken(AppUser user)
+    public async Task<string> CreateToken(AppUser user)
     {
         var tokenKey = config["TokenKey"] ?? throw new Exception("TokenKey not found in configuration");
         if (tokenKey.Length < 64)
@@ -21,10 +22,13 @@ public class TokenService(IConfiguration config) : ITokenService //IConfiguratio
 
         var claims = new List<Claim> //Claims are used to store information about the user that is included in the JWT token. In this case, we are adding claims for the user's email, unique identifier (Id), and username. These claims can be accessed by the server when the token is received in subsequent requests, allowing us to identify the user and perform authorization checks based on their identity and roles. By including these claims in the token, we can ensure that the necessary information about the user is available for authentication and authorization purposes throughout the application.
         {
-            new Claim(ClaimTypes.Email, user.Email!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName!)
+            new(ClaimTypes.Email, user.Email!),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.UserName!)
         };
+
+        var roles = await userManager.GetRolesAsync(user); //GetRolesAsync is a method of the UserManager class that retrieves the roles associated with the specified user. In this case, we are calling this method to get the roles for the user and then adding them as claims to the JWT token. By including the user's roles in the token, we can perform role-based authorization checks in subsequent requests, allowing us to control access to certain resources or actions based on the user's assigned roles.
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature); //SigningCredentials are used to specify the security key and algorithm that will be used to sign the JWT token. In this case, we are using the symmetric security key that we created earlier and the HMAC SHA-512 algorithm for signing. This ensures that the token is securely signed and can be validated by the server when it is received in subsequent requests. By using strong signing credentials, we can help protect against tampering and ensure the integrity of the tokens used for user authentication.
 

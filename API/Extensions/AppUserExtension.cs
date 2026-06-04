@@ -5,14 +5,14 @@ namespace API.Extensions
 {
     public static class AppUserExtensions //We can not do dependency injection in static classes so passing ITokenService as parameter
     {
-        public static UserDTO AsUserDTO(this AppUser user, ITokenService tokenService)
+     public static async Task<UserDTO> AsUserDTO(this AppUser user, ITokenService tokenService)
         {
             return new UserDTO
             {
                 Id = user.Id,
                 UserName = user.UserName!,
                 Email = user.Email!,
-                Token = tokenService.CreateToken(user),
+                Token = await tokenService.CreateToken(user),
                 ImageUrl= user.ImageUrl
             };
         }

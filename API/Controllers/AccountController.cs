@@ -49,7 +49,7 @@ namespace API.Controllers
                 // return ValidationProblem();
             }
 
-            return newUser.AsUserDTO(tokenService);
+            return await newUser.AsUserDTO(tokenService);
         }
 
       
@@ -72,7 +72,7 @@ namespace API.Controllers
                 return Unauthorized("Invalid Password");
             }
 
-            return user.AsUserDTO(tokenService);
+            return await user.AsUserDTO(tokenService);
         }
     }
 }
