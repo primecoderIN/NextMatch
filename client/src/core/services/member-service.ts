@@ -14,6 +14,7 @@ export class MemberService {
   private http = inject(HttpClient);
   // private accountService = inject(AccountService);
   private baseUrl = environment.apiUrl;
+  private memberDataVersion = 0;
   member = signal<Member | null>(null);
   isEditModeEnabled = signal<boolean>(false);
 
@@ -36,9 +37,13 @@ export class MemberService {
   }
 
   getMemberById(id: string): Observable<Member> {
+    const requestMemberDataVersion = this.memberDataVersion;
+
     return this.http.get<Member>(this.baseUrl + `members/${id}`).pipe(
       tap((member) => {
-        this.member.set({ ...member });
+        if (requestMemberDataVersion === this.memberDataVersion) {
+          this.member.set({ ...member });
+        }
       }),
     );
   }
@@ -66,6 +71,7 @@ export class MemberService {
   }
 
   clearMemberData() {
+    this.memberDataVersion++;
     this.member.set(null);
     this.isEditModeEnabled.set(false);
     localStorage.removeItem('filters');

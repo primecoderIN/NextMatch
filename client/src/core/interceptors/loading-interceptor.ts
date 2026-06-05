@@ -5,9 +5,11 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { delay, of, tap } from 'rxjs';
 
 const cache = new Map<string, any>();
+let cacheVersion = 0;
 
 export const clearHttpCache = () => {
   cache.clear();
+  cacheVersion++;
 };
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
@@ -56,10 +58,14 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   busyService.busy();
+  const requestCacheVersion = cacheVersion;
+
   return next(req).pipe(
     delay(500), //to avoid flickering for fast requests
     tap((response) => {
-      cache.set(cacheKey, response); //store the response in cache
+      if (req.method === 'GET' && requestCacheVersion === cacheVersion) {
+        cache.set(cacheKey, response); //store the response in cache
+      }
     }),
     finalize(() => busyService.idle()), //runs once nomatter success or error
   );
