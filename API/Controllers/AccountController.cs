@@ -114,13 +114,12 @@ namespace API.Controllers
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly= true,
-                Secure=true,
-                SameSite=SameSiteMode.Strict,
-                Expires=DateTime.UtcNow.AddDays(7)
-                
+                HttpOnly = true,
+                Secure = Request.IsHttps,
+                SameSite = Request.IsHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(7),
             };
-            Response.Cookies.Append("refreshToken",refreshToken, cookieOptions);
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
     }
 
