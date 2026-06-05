@@ -1,6 +1,7 @@
 using API.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using API.DTOs;
 using API.Interfaces;
 using API.Extensions; //To use AsUserDTO extension method
@@ -50,7 +51,8 @@ namespace API.Controllers
             }
 
             await userManager.AddToRoleAsync(newUser, "Member"); // Assign the "Member" role to the new user
-
+            
+            await SetRefreshTokenCookie(newUser);
             return await newUser.AsUserDTO(tokenService);
         }
 
@@ -74,7 +76,53 @@ namespace API.Controllers
                 return Unauthorized("Invalid Password");
             }
 
+            await SetRefreshTokenCookie(user);
+
             return await user.AsUserDTO(tokenService);
         }
+
+        [HttpPost]
+        [Route("refresh-token")]
+        public async Task<ActionResult<UserDTO>> GetNewRefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken) || refreshToken ==null)
+            {
+                return Unauthorized("No refresh token provided");
+            }
+
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiryTime > DateTime.UtcNow);
+
+            if(user == null)
+            {
+                return Unauthorized("Invalid or expired refresh token");
+            }
+
+            await SetRefreshTokenCookie(user);
+
+            return await user.AsUserDTO(tokenService);
+
+        }
+
+
+          private async Task SetRefreshTokenCookie(AppUser user)
+        {
+            var refreshToken = tokenService.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await userManager.UpdateAsync(user);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly= true,
+                Secure=true,
+                SameSite=SameSiteMode.Strict,
+                Expires=DateTime.UtcNow.AddDays(7)
+                
+            };
+            Response.Cookies.Append("refreshToken",refreshToken, cookieOptions);
+        }
     }
+
+  
 }

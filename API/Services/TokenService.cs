@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using API.Entities;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
 
 namespace API.Services;
 
@@ -35,7 +36,7 @@ public class TokenService(IConfiguration config, UserManager<AppUser> userManage
         var tokenDescriptor = new SecurityTokenDescriptor //SecurityTokenDescriptor is used to define the properties of the JWT token that we want to create. It includes the claims that we want to include in the token, the expiration time for the token (in this case, 7 days), and the signing credentials that we defined earlier. By setting these properties in the token descriptor, we can ensure that the generated token contains the necessary information about the user and is securely signed for authentication purposes.
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(7),
+            Expires = DateTime.Now.AddMinutes(10),
             SigningCredentials = creds
         };
 
@@ -44,5 +45,11 @@ public class TokenService(IConfiguration config, UserManager<AppUser> userManage
         var token = tokenHandler.CreateToken(tokenDescriptor); //CreateToken is a method of the JwtSecurityTokenHandler that takes the token descriptor as input and generates a JWT token based on the properties defined in the descriptor. This method creates a token that includes the specified claims, expiration time, and signing credentials, allowing us to generate secure tokens for user authentication.
 
         return tokenHandler.WriteToken(token); //WriteToken is a method of the JwtSecurityTokenHandler that takes the generated token as input and converts it to a string format that can be returned to the client. This method serializes the token into a compact, URL-safe string representation that can be easily transmitted in HTTP headers or other communication channels. By using WriteToken, we can ensure that the generated JWT token is properly formatted for use in subsequent requests and can be easily consumed by the client for authentication purposes.
+    }
+
+    public string GenerateRefreshToken()
+    {
+       var randomBytes = RandomNumberGenerator.GetBytes(64);
+       return Convert.ToBase64String(randomBytes); 
     }
 }
