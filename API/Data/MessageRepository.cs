@@ -25,17 +25,44 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
 
     public async Task<PaginatedResult<MessageDTO>> GetMessagesForMember(MessageParams messageParams)
     {
-         var query = context.Messages.OrderByDescending(x=> x.MessageSent).AsQueryable(); //get the last message first 
+         var memberId = messageParams.MemberId
+            ?? throw new ArgumentException("MemberId is required", nameof(messageParams));
+         var container = messageParams.Container.ToLowerInvariant();
 
-         query = messageParams.Container.ToLowerInvariant() switch
+         var query = context.Messages.AsQueryable();
+         
+         query = container switch
          {
-             "outbox" => query.Where(x=> x.SenderId==messageParams.MemberId && x.SenderDeleted==false),
-             _ => query.Where(x=> x.RecipientId==messageParams.MemberId && x.RecipientDeleted==false)
+             "outbox" => query.Where(x => x.SenderId == memberId && !x.SenderDeleted),
+             _ => query.Where(x => x.RecipientId == memberId && !x.RecipientDeleted)
          };
 
-         var messageQuery = query.Select(MessageExtension.ToDTOProjection());
+         var messages = await query
+            .OrderByDescending(x => x.MessageSent)
+            .Select(MessageExtension.ToDTOProjection())
+            .ToListAsync();
 
-         return await PaginationHelper<MessageDTO>.CreateAsync(messageQuery, messageParams.PageNumber, messageParams.PageSize);
+         var groupedMessages = container == "outbox"
+            ? messages.GroupBy(x => x.RecipientId).Select(x => x.First()).ToList()
+            : messages.GroupBy(x => x.SenderId).Select(x => x.First()).ToList();
+
+         var count = groupedMessages.Count;
+         var items = groupedMessages
+            .Skip((messageParams.PageNumber - 1) * messageParams.PageSize)
+            .Take(messageParams.PageSize)
+            .ToList();
+
+         return new PaginatedResult<MessageDTO>
+         {
+            MetaData = new PaginationMetaData
+            {
+               CurrentPage = messageParams.PageNumber,
+               TotalPages = (int)Math.Ceiling(count / (double)messageParams.PageSize),
+               PageSize = messageParams.PageSize,
+               TotalCount = count
+            },
+            Items = items
+         };
          
     }
 
