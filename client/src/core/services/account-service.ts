@@ -77,6 +77,7 @@ export class AccountService {
     };
 
     this.currentUser.set(userWithRoles);
+    try { localStorage.setItem('isLoggedIn', 'true'); } catch {}
     this.likeService.getLikeIds();
 
     //If connection is not established and user is logged in then do it
@@ -97,6 +98,7 @@ export class AccountService {
   }
 
   private clearUserState() {
+    try { localStorage.setItem('isLoggedIn', 'false'); } catch {}
     this.currentUser.set(null);
     this.memberService.clearMemberData();
     this.likeService.clearLikeIds();

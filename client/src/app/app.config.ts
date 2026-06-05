@@ -19,6 +19,13 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor, loadingInterceptor])), //Enables HttpClient throughout the app and activats interceptor
     provideAppInitializer(() => {
       const accountService = inject(AccountService);
+      // Skip refresh-token call if we know user is logged out
+      try {
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+          return Promise.resolve(null);
+        }
+      } catch {}
+
       return firstValueFrom(accountService.refreshToken().pipe(catchError(() => of(null)))).then((user) => {
         if (user) {
           (accountService as any).setCurrentUser?.(user);
