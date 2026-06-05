@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
@@ -25,6 +26,13 @@ namespace API.Controllers
         public IActionResult GetBadRequest()
         {
             return BadRequest("Bad request!");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin")]
+        public IActionResult GetAdmin()
+        {
+            return Ok("You are an admin!");
         }
 }
 }
