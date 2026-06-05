@@ -86,9 +86,21 @@ export class AccountService {
   }
 
   logout() {
+    this.http.post<void>(this.baseUrl + 'account/logout', {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.clearUserState();
+      },
+      error: () => {
+        this.clearUserState();
+      },
+    });
+  }
+
+  private clearUserState() {
     this.currentUser.set(null);
     this.memberService.clearMemberData();
     this.likeService.clearLikeIds();
+    this.presenceService.stopHubConnection();
     clearHttpCache();
   }
 

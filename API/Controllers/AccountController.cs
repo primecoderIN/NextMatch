@@ -1,4 +1,5 @@
 using API.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -86,14 +87,14 @@ namespace API.Controllers
         public async Task<ActionResult<UserDTO>> GetNewRefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            if (string.IsNullOrEmpty(refreshToken) || refreshToken ==null)
+            if (string.IsNullOrEmpty(refreshToken) || refreshToken == null)
             {
                 return Unauthorized("No refresh token provided");
             }
 
             var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiryTime > DateTime.UtcNow);
 
-            if(user == null)
+            if (user == null)
             {
                 return Unauthorized("Invalid or expired refresh token");
             }
@@ -101,11 +102,34 @@ namespace API.Controllers
             await SetRefreshTokenCookie(user);
 
             return await user.AsUserDTO(tokenService);
-
         }
 
+        [HttpPost("logout")]
+        public async Task<ActionResult> Logout()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+                if (user != null)
+                {
+                    user.RefreshToken = null;
+                    user.RefreshTokenExpiryTime = null;
+                    await userManager.UpdateAsync(user);
+                }
+            }
 
-          private async Task SetRefreshTokenCookie(AppUser user)
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsHttps,
+                SameSite = Request.IsHttps ? SameSiteMode.None : SameSiteMode.Lax,
+            });
+
+            return NoContent();
+        }
+
+        private async Task SetRefreshTokenCookie(AppUser user)
         {
             var refreshToken = tokenService.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
