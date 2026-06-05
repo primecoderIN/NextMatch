@@ -13,7 +13,21 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/* =======================
+   Database
+   ======================= */
+   //This options are passed to the base DbContext constructor in AppDBContext, which is required for EF Core to function properly.
+   //Because AppDBContext needs to know how to conect to the dabatase. 
+builder.Services.AddDbContext<AppDBContext>(options =>
+{
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    );
+});
 
+/* =======================
+   Controllers
+   ======================= */
 //Formatting all time to proper utc date time in apis
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -34,6 +48,14 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:4200", "https://localhost:4200")
             .AllowCredentials();
     });
+});
+
+/* =======================
+   Routing
+   ======================= */
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
 });
 
 //ASP.NET Core Identity configuration
@@ -68,9 +90,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //Thi
 /* =======================
    Authorization
    ======================= */
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
+    .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
 
 // 
+
+/* =======================
+   Application Services
+   ======================= */
+   //This service is needed to generate JWT tokens for user authentication. By registering it in the dependency injection container, we can easily inject it into our controllers and other services where we need to create tokens for authenticated users. This allows us to centralize our token generation logic and makes it easier to maintain and update in the future if needed.
+builder.Services.AddScoped<ITokenService, TokenService>(); //Scoped means a new instance of the service will be created for each HTTP request, and that same instance will be used throughout the entire request. This is useful for services that need to maintain state or perform operations that are specific to a single request, such as database contexts or services that handle user authentication. By using scoped services, we can ensure that each request gets its own instance of the service, which can help prevent issues with shared state and improve the overall performance and reliability of the application.
+
+builder.Services.AddScoped<LogUserActivity>();
 
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
@@ -81,14 +113,6 @@ builder.Services.AddScoped<ILikesRepository,LikesReporitory>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); //Key should be same as app settings
-
-/* =======================
-   Routing
-   ======================= */
-builder.Services.AddRouting(options =>
-{
-    options.LowercaseUrls = true;
-});
 
 // Swagger/OpenAPI (only enabled in Development)
 builder.Services.AddEndpointsApiExplorer();
@@ -118,31 +142,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-/* =======================
-   Database
-   ======================= */
-   //This options are passed to the base DbContext constructor in AppDBContext, which is required for EF Core to function properly.
-   //Because AppDBContext needs to know how to conect to the dabatase. 
-builder.Services.AddDbContext<AppDBContext>(options =>
-{
-    options.UseSqlite(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    );
-});
-
-/* =======================
-   Application Services
-   ======================= */
-   //This service is needed to generate JWT tokens for user authentication. By registering it in the dependency injection container, we can easily inject it into our controllers and other services where we need to create tokens for authenticated users. This allows us to centralize our token generation logic and makes it easier to maintain and update in the future if needed.
-builder.Services.AddScoped<ITokenService, TokenService>(); //Scoped means a new instance of the service will be created for each HTTP request, and that same instance will be used throughout the entire request. This is useful for services that need to maintain state or perform operations that are specific to a single request, such as database contexts or services that handle user authentication. By using scoped services, we can ensure that each request gets its own instance of the service, which can help prevent issues with shared state and improve the overall performance and reliability of the application.
-
-builder.Services.AddScoped<LogUserActivity>();
-
-/* =======================
-   Controllers
-   ======================= */
-builder.Services.AddControllers();
-
 var app = builder.Build();
 
 /* =======================
@@ -150,6 +149,13 @@ var app = builder.Build();
    ======================= */
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+// Enable Swagger only in Development environment
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection(); //Not required if we enforce https in angular dev server, but good to have in production environment
 
@@ -161,13 +167,6 @@ app.UseAuthentication(); // Who are you
 app.UseAuthorization();  // What are you allowed to do
 
 app.MapControllers();
-
-// Enable Swagger only in Development environment
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 //Creating scope outside http request pipeline to do migrations
 using var scope = app.Services.CreateScope();

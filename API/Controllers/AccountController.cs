@@ -49,6 +49,8 @@ namespace API.Controllers
                 // return ValidationProblem();
             }
 
+            await userManager.AddToRoleAsync(newUser, "Member"); // Assign the "Member" role to the new user
+
             return await newUser.AsUserDTO(tokenService);
         }
 
