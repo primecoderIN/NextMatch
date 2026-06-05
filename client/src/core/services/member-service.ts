@@ -65,6 +65,12 @@ export class MemberService {
     return this.http.delete<void>(this.baseUrl + `members/delete-photo/${photo.id}`);
   }
 
+  clearMemberData() {
+    this.member.set(null);
+    this.isEditModeEnabled.set(false);
+    localStorage.removeItem('filters');
+  }
+
   //This now we are doing using interceptor for each request
   // private getHttpOptions() {
   //   return {

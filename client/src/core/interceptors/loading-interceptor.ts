@@ -6,6 +6,10 @@ import { delay, of, tap } from 'rxjs';
 
 const cache = new Map<string, any>();
 
+export const clearHttpCache = () => {
+  cache.clear();
+};
+
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const busyService = inject(BusyService);
 

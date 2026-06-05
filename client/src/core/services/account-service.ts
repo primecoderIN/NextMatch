@@ -4,6 +4,8 @@ import { RegisterCredentials, User } from '../../types/user';
 import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LikesService } from './likes-service';
+import { MemberService } from './member-service';
+import { clearHttpCache } from '../interceptors/loading-interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +13,7 @@ import { LikesService } from './likes-service';
 export class AccountService {
   private http = inject(HttpClient);
   private likeService = inject(LikesService);
+  private memberService = inject(MemberService);
   currentUser = signal<User | null>(null);
 
   private baseUrl = environment.apiUrl;
@@ -44,8 +47,9 @@ export class AccountService {
   logout() {
     this.currentUser.set(null);
     localStorage.removeItem('user');
-    localStorage.removeItem("filters");
+    this.memberService.clearMemberData();
     this.likeService.clearLikeIds();
+    clearHttpCache();
   }
 
   get isLoggedIn(): boolean {
