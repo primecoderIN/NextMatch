@@ -7,6 +7,7 @@ import { LikesService } from './likes-service';
 import { MemberService } from './member-service';
 import { clearHttpCache } from '../interceptors/loading-interceptor';
 import { jwtDecode } from 'jwt-decode';
+import { PresenceService } from './presence-service';
 
 type DecodedToken = {
   role?: string | string[];
@@ -21,6 +22,7 @@ export class AccountService {
   private http = inject(HttpClient);
   private likeService = inject(LikesService);
   private memberService = inject(MemberService);
+  private presenceService = inject(PresenceService);
   currentUser = signal<User | null>(null);
 
   private baseUrl = environment.apiUrl;
@@ -76,6 +78,11 @@ export class AccountService {
 
     this.currentUser.set(userWithRoles);
     this.likeService.getLikeIds();
+
+    //If connection is not established and user is logged in then do it
+    if(this.presenceService.isHubConnectionStateIsConnected===false) {
+      this.presenceService.createHubConnection(user);
+    }
   }
 
   logout() {
