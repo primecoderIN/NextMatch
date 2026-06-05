@@ -87,9 +87,11 @@
             >Admin</a
           >
         }
-        <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/errors" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
-          >Test Error</a
-        >
+        @if (accountService.hasRole('Developer')) {
+          <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/errors" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
+            >Test Error</a
+          >
+        }
       </nav>
     }
 

@@ -5,7 +5,6 @@ import { MemberDetail } from '../features/members/member-detail/member-detail';
 import { Lists } from '../features/lists/lists';
 import { Messages } from '../features/messages/messages';
 import { authGuard } from '../core/guards/auth-guard';
-import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/not-found/not-found';
 import { ServerError } from '../shared/server-error/server-error';
 import { MemberProfile } from '../features/members/member-profile/member-profile';
@@ -13,7 +12,6 @@ import { MemberPhotos } from '../features/members/member-photos/member-photos';
 import { MemberMessages } from '../features/members/member-messages/member-messages';
 import { memberResolver } from '../features/members/member-resolver';
 import { preventUnsavedChangesGuard } from '../core/guards/prevent-unsaved-changes-guard';
-import { AdminPanel } from '../features/admin/admin-panel/admin-panel';
 import { adminGuard } from '../core/guards/admin-guard';
 
 export const routes: Routes = [
@@ -75,14 +73,14 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        component: AdminPanel,
+        loadComponent: () => import('../features/admin/admin-panel/admin-panel').then(m => m.AdminPanel),
         canActivate: [adminGuard],
       },
     ],
   },
   {
     path: 'errors',
-    component: TestErrors,
+    loadComponent: () => import('../features/test-errors/test-errors').then(m => m.TestErrors),
   },
 
   {
