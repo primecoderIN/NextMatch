@@ -82,6 +82,11 @@
         <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/messages" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
           >Messages</a
         >
+        @if (accountService.hasRole('Admin')) {
+          <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/admin" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
+            >Admin</a
+          >
+        }
         <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/errors" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
           >Test Error</a
         >

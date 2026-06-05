@@ -47,6 +47,10 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     invalidateCache('messages');
   }
 
+  if (req.method !== 'GET' && req.url.includes('admin')) {
+    invalidateCache('admin');
+  }
+
   const cacheKey = generateCacheKey(req.url, req.params);
 
   if (req.method === 'GET') {

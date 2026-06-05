@@ -1,0 +1,104 @@
+<section class="flex flex-col gap-6">
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">Admin</p>
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Role management</h1>
+      </div>
+
+      <button
+        type="button"
+        class="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="loading()"
+        (click)="loadUsers()"
+      >
+        {{ loading() ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    @if (loading() && users().length === 0) {
+      <div class="px-6 py-12 text-center text-sm text-slate-500">Loading users...</div>
+    } @else if (users().length > 0) {
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100 text-left text-sm">
+          <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <tr>
+              <th class="px-5 py-3">User</th>
+              <th class="px-5 py-3">Roles</th>
+              <th class="px-5 py-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (user of users(); track user.id) {
+              <tr class="align-top">
+                <td class="px-5 py-4">
+                  <p class="font-semibold text-slate-900">{{ user.userName }}</p>
+                  <p class="mt-1 text-xs text-slate-500">{{ user.id }}</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex flex-wrap gap-2">
+                    @for (role of availableRoles; track role) {
+                      <label class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700">
+                        <input
+                          type="checkbox"
+                          class="size-4 rounded border-slate-300 text-indigo-600"
+                          [checked]="hasSelectedRole(user.id, role)"
+                          [disabled]="isSaving(user.id)"
+                          (change)="toggleRole(user.id, role, $any($event.target).checked)"
+                        />
+                        {{ role }}
+                      </label>
+                    }
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-right">
+                  <button
+                    type="button"
+                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="!rolesChanged(user) || isSaving(user.id)"
+                    (click)="saveRoles(user)"
+                  >
+                    {{ isSaving(user.id) ? 'Saving...' : 'Save' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="px-6 py-12 text-center text-sm text-slate-500">No users found.</div>
+    }
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">Moderation</p>
+        <h2 class="mt-1 text-xl font-bold text-slate-900">Photo moderation</h2>
+      </div>
+
+      <button
+        type="button"
+        class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+        (click)="loadPhotoModerationStatus()"
+      >
+        Check status
+      </button>
+    </div>
+
+    @if (moderationMessage(); as message) {
+      <p class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+        {{ message }}
+      </p>
+    } @else if (moderationError(); as error) {
+      <p class="mt-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+        {{ error }}
+      </p>
+    } @else {
+      <p class="mt-4 text-sm text-slate-500">Checking photo moderation access...</p>
+    }
+  </div>
+</section>

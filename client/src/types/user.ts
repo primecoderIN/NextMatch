@@ -3,7 +3,8 @@ export type User = {
     userName: string,
     token: string,
     email: string ,
-    imageUrl?: string
+    imageUrl?: string,
+    roles?: string[]
 }
 
 export type LoginCredentials = {

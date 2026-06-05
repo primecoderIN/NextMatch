@@ -32,7 +32,7 @@ export class App implements OnInit {
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const user = JSON.parse(userJson);
-      this.accountService.currentUser.set(user);
+      this.accountService.setCurrentUser(user);
     }
   };
 

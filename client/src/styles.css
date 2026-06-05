@@ -15,8 +15,20 @@
 
   button,
   a,
-  summary {
-    @apply transition-colors duration-200;
+  summary,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="checkbox"],
+  [role="button"] {
+    @apply transition-colors duration-200 cursor-pointer;
+  }
+
+  button:disabled,
+  input[type="button"]:disabled,
+  input[type="submit"]:disabled,
+  input[type="reset"]:disabled {
+    @apply cursor-not-allowed;
   }
 }
 
