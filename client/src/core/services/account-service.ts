@@ -26,23 +26,46 @@ export class AccountService {
   private baseUrl = environment.apiUrl;
 
   register(requestBody: RegisterCredentials) {
-    return this.http.post<User>(this.baseUrl + 'account/register', requestBody).pipe(
+    return this.http.post<User>(this.baseUrl + 'account/register', requestBody, {
+      withCredentials: true,
+    }).pipe(
       tap((user) => {
         if (user) {
           this.setCurrentUser(user);
+          this.startTokenRefreshTimer();
         }
       }),
     );
   }
 
   login(requestBody: any) {
-    return this.http.post<User>(this.baseUrl + 'account/login', requestBody).pipe(
+    return this.http.post<User>(this.baseUrl + 'account/login', requestBody, {withCredentials: true}).pipe(
       tap((user) => {
         if (user) {
           this.setCurrentUser(user);
+          this.startTokenRefreshTimer();
         }
       }),
     );
+  }
+
+  refreshToken() {
+    return this.http.post<User>(this.baseUrl + 'account/refresh-token', {}, {withCredentials: true});
+  }
+
+  startTokenRefreshTimer() {
+    setInterval(() => {
+      this.http.post<User>(this.baseUrl + 'account/refresh-token', {}, {withCredentials: true}).subscribe({
+      next: (user) => {
+        if (user) {
+          this.setCurrentUser(user);
+        }
+      },
+      error: () => {
+        this.logout();
+      },
+    });
+    }, 5*60*1000); // Refresh token every 5 minutes
   }
 
   setCurrentUser(user: User) {
@@ -52,13 +75,11 @@ export class AccountService {
     };
 
     this.currentUser.set(userWithRoles);
-    localStorage.setItem('user', JSON.stringify(userWithRoles));
     this.likeService.getLikeIds();
   }
 
   logout() {
     this.currentUser.set(null);
-    localStorage.removeItem('user');
     this.memberService.clearMemberData();
     this.likeService.clearLikeIds();
     clearHttpCache();
