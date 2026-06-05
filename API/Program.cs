@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using API.Helpers;
+using API.SignalR;
 using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +87,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //Thi
             ValidateAudience = false, // Similar to issuer validation, we are also not validating the audience of the token. This means that we are not checking if the token is intended for a specific audience or application. Disabling audience validation can be useful in scenarios where we want to allow tokens that are meant for multiple audiences or when we don't have a specific audience to validate against. However, like with issuer validation, it's important to consider the security implications of disabling audience validation and ensure that it aligns with the overall security requirements of the application.
             ClockSkew = TimeSpan.Zero //This property is used to specify the amount of time that the token validation process should allow for clock skew when validating the expiration time of a JWT token. By setting this property to TimeSpan.Zero, we are effectively disabling any allowance for clock skew, which means that the token will be considered expired immediately after its expiration time has passed. This can enhance security by ensuring that expired tokens are not accepted, but it also means that there is no grace period for potential discrepancies in system clocks between the token issuer and the token validator.
         };
+
+        options.Events = new JwtBearerEvents 
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if(!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 /* =======================
@@ -142,6 +159,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddSignalR(); //Added signal r as service
+
 var app = builder.Build();
 
 /* =======================
@@ -167,6 +186,8 @@ app.UseAuthentication(); // Who are you
 app.UseAuthorization();  // What are you allowed to do
 
 app.MapControllers();
+
+app.MapHub<PresenceHub>("hubs/presence"); //Configure signal r pipeline with presence hub class
 
 //Creating scope outside http request pipeline to do migrations
 using var scope = app.Services.CreateScope();
