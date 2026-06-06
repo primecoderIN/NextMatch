@@ -41,10 +41,10 @@ export class MessageService {
     })
 
     this.hubConnection.on("NewMessage", (message: Message) => {
-      this.mesageThread.update(messages => {
-        const updatedMessages = [...messages, {...message, currentUserSender: message.senderId === currentUser.id}];
-        return updatedMessages;
-      });
+      this.mesageThread.update(messages => [
+        ...messages,
+        { ...message, currentUserSender: message.senderId === currentUser.id }
+      ]);
     });
   }
 

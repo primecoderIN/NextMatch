@@ -41,37 +41,21 @@ export class MemberMessages implements OnInit, OnDestroy {
     const content = this.newMessage().trim();
     if (!content) return;
 
-    const user = this.accountService.currentUser();
     const other = this.memberService.member();
-    if (!other || !user) return;
+    if (!other) return;
 
-    // Optimistic update — show message immediately in the thread
-    const optimistic: Message = {
-      id: Math.random().toString(36).slice(2),
-      senderId: user.id,
-      senderUsername: user.userName,
-      senderImageUrl: user.imageUrl || null,
-      recipientId: other.id,
-      recipientUsername: other.userName,
-      recipientImageUrl: other.imageUrl || null,
-      content: content,
-      messageSent: new Date().toISOString(),
-      currentUserSender: true,
-    };
-    this.messageService.mesageThread.update(msgs => [...msgs, optimistic]);
+    // Clear the input immediately for responsiveness
     this.newMessage.set('');
 
+    // Let the server confirm via NewMessage SignalR event — no optimistic update needed
+    // since Clients.Group() on the server sends back to the sender too
     this.messageService.addMessageToThread(other.id, content)?.then(() => {
-      this.scrollToBottom();
+      setTimeout(() => this.scrollToBottom(), 30);
     }).catch(err => {
       console.error('Failed to send message:', err);
-      // Rollback optimistic message if send fails
-      this.messageService.mesageThread.update(msgs =>
-        msgs.filter(m => m.id !== optimistic.id)
-      );
+      // Restore message text if send fails
+      this.newMessage.set(content);
     });
-
-    setTimeout(() => this.scrollToBottom(), 30);
   }
 
   private scrollToBottom() {
