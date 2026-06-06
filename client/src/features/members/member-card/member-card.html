@@ -8,6 +8,18 @@
       </svg>
     </button>
 
+    <div class="absolute left-3 top-3 z-10 flex items-center gap-2 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-semibold text-white shadow-md backdrop-blur">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="absolute inset-0 rounded-full" [class.bg-emerald-400]="isOnline()" [class.bg-slate-400]="!isOnline()"></span>
+
+        @if(isOnline()) {
+        <span  class="absolute inset-0 animate-ping rounded-full bg-emerald-400/50"></span>
+        }
+
+      </span>
+      <span>{{ isOnline() ? 'Online' : 'Offline' }}</span>
+    </div>
+
     <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-slate-950 via-slate-950/75 to-transparent px-4 pb-4 pt-16 text-white">
       <p class="text-lg font-semibold">{{ member.userName }}, {{ member.dateOfBirth | age }}</p>
       <p class="text-sm text-slate-200">{{ member.city }}</p>

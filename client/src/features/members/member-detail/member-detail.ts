@@ -18,6 +18,7 @@ import { LikesService } from '../../../core/services/likes-service';
 import { BusyService } from '../../../core/services/busy-service';
 import { Skeleton } from '../../../shared/skeleton/skeleton';
 import { Location } from '@angular/common';
+import { PresenceService } from '../../../core/services/presence-service';
 
 @Component({
   selector: 'app-member-detail',
@@ -33,6 +34,7 @@ export class MemberDetail implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
   private likesService = inject(LikesService);
+  private presenceService = inject(PresenceService);
   // protected member$!: Observable<Member>;
   protected title = signal<string | undefined>('Profile'); //Profile will be initial tab
 
@@ -40,6 +42,13 @@ export class MemberDetail implements OnInit {
 
   protected isCurrentUser = computed(() => {
     return this.accountService?.currentUser()?.id === this.id;
+  });
+
+  protected isOnline = computed(() => {
+    if (!this.id) {
+          return false;
+        }
+    return this.presenceService.onlineUsers()?.includes(this.id) ?? false;
   });
 
   ngOnInit(): void {

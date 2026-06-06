@@ -1,6 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { ToastService } from './toast-service';
 import { User } from '../../types/user';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 
@@ -9,8 +8,8 @@ import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@micros
 })
 export class PresenceService {
   private hubUrl = environment.hubUrl;
-  private toastService = inject(ToastService);
   private hubConnection?: HubConnection;
+   onlineUsers = signal<string[]>([]);
 
   createHubConnection(user: User) {
     this.hubConnection = new HubConnectionBuilder()
@@ -22,13 +21,17 @@ export class PresenceService {
 
     this.hubConnection.start().catch(error => console.log(error));
 
-    this.hubConnection.on("UserOnline", email => {
-      this.toastService.success(`${email} is online now.`);
+    this.hubConnection.on("UserOnline", userId => {
+      this.onlineUsers.update(prevUsers=> [...prevUsers,userId]);
     });
 
-    this.hubConnection.on("UserOffline", email => {
-      this.toastService.success(`${email} is offline now.`);
+    this.hubConnection.on("UserOffline", userId => {
+      this.onlineUsers.update(prevUsers=> prevUsers.filter(uId=> uId!==userId));
     });
+
+    this.hubConnection.on("GetAllOnlineUsers", onlineUserIds=> {
+      this.onlineUsers.set(onlineUserIds);
+    })
   }
 
   stopHubConnection() {

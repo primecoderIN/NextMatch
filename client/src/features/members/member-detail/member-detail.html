@@ -8,6 +8,16 @@
       <div class="bg-linear-to-br from-indigo-600 to-slate-900 px-5 py-6 text-center text-white">
         <img [src]="member.imageUrl || '/user.png'" [alt]="member.userName" class="mx-auto size-32 rounded-full object-cover ring-4 ring-white/25" />
         <h1 class="mt-4 text-2xl font-bold">{{ member.userName }}, {{ member.dateOfBirth | age }}</h1>
+        <div class="mx-auto mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-100">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="absolute inset-0 rounded-full" [class.bg-emerald-400]="isOnline()" [class.bg-slate-400]="!isOnline()"></span>
+            @if(isOnline()) {
+            <span  class="absolute inset-0 animate-ping rounded-full bg-emerald-400/50"></span>
+            }
+
+          </span>
+          <span>{{ isOnline() ? 'Online' : 'Offline' }}</span>
+        </div>
         <p class="mt-1 text-sm text-indigo-100">{{ member.city }}, {{ member.country }}</p>
       </div>
 
