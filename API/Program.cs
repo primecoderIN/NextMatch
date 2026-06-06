@@ -162,6 +162,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSignalR(); //Added signal r as service
 builder.Services.AddSingleton<PresenceTracker>(); //Add presence tracker as singleton so it does not destroy
 
+
 var app = builder.Build();
 
 /* =======================
@@ -189,6 +190,7 @@ app.UseAuthorization();  // What are you allowed to do
 app.MapControllers();
 
 app.MapHub<PresenceHub>("hubs/presence"); //Configure signal r pipeline with presence hub class
+app.MapHub<MessageHub>("hubs/messages"); 
 
 //Creating scope outside http request pipeline to do migrations
 using var scope = app.Services.CreateScope();
