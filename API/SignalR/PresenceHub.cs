@@ -15,7 +15,7 @@ namespace API.SignalR;
        //Inform others that a new user is connected
        await Clients.Others.SendAsync("UserOnline", GetUserId());
 
-       var currentOnlineUsers = presenceTracker.GetOnlineUsers();
+       var currentOnlineUsers = await presenceTracker.GetOnlineUsers();
        //Sent list of all online users to all the connected users 
        await Clients.Caller.SendAsync("GetAllOnlineUsers",currentOnlineUsers);
     }

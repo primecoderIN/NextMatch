@@ -38,6 +38,7 @@ export class PresenceService {
     if(this.hubConnection?.state===HubConnectionState.Connected){
       this.hubConnection.stop().catch(err=> console.log(err))
     }
+    this.onlineUsers.set([]);
   }
 
   get isHubConnectionActive() {
