@@ -1,6 +1,7 @@
 using API.Data;
 using API.DTOs;
 using API.Extensions;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using API.Entities;
@@ -8,7 +9,7 @@ using API.Entities;
 namespace API.SignalR;
 
 [Authorize]
-public class MessageHub(MessageRepository messageRepository, MemberRepository memberRepository) : Hub
+public class MessageHub(IMessageRepository messageRepository, IMemberRepository memberRepository) : Hub
 {
     public override async Task OnConnectedAsync()
     {

@@ -8,9 +8,9 @@
   </div>
 
   <div class="thread-body p-4" id="threadScroll">
-    @if (messageThread().length === 0 && busyService.busyRequestCount() > 0) {
+    @if (this.messageService.mesageThread().length === 0 && this.busyService.busyRequestCount() > 0) {
       <app-skeleton layout="list" [count]="4"></app-skeleton>
-    } @else if (messageThread(); as messages) {
+    } @else if (this.messageService.mesageThread(); as messages) {
       @if (messages.length > 0) {
         @for (message of messages; track message.id) {
           @if (message.senderId === currentUserId()) {
