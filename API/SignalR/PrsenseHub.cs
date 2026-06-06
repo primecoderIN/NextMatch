@@ -9,7 +9,7 @@ namespace API.SignalR;
     {
     public override async Task OnConnectedAsync() //Things we want to do when user connects to hub goes here
     {
-       await Clients.Others.SendAsync("UserOnline", Context.User?.FindFirst(ClaimTypes.Email));
+       await Clients.Others.SendAsync("UserOnline", Context.User?.FindFirstValue(ClaimTypes.Email));
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)

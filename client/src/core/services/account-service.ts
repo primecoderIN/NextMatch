@@ -80,8 +80,8 @@ export class AccountService {
     try { localStorage.setItem('isLoggedIn', 'true'); } catch {}
     this.likeService.getLikeIds();
 
-    //If connection is not established and user is logged in then do it
-    if(this.presenceService.isHubConnectionStateIsConnected===false) {
+    // Only create a new hub connection if one isn't already active
+    if (!this.presenceService.isHubConnectionActive) {
       this.presenceService.createHubConnection(user);
     }
   }

@@ -13,7 +13,6 @@ export class PresenceService {
   private hubConnection?: HubConnection;
 
   createHubConnection(user: User) {
-    //first build the connection
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.hubUrl + 'presence', {
         accessTokenFactory: () => user.token,
@@ -21,16 +20,15 @@ export class PresenceService {
       .withAutomaticReconnect()
       .build();
 
-    //Then start the connection
-    this.hubConnection.start().catch(error=> console.log(error));
+    this.hubConnection.start().catch(error => console.log(error));
 
-    this.hubConnection.on("UserOnline", email=> {
-      this.toastService.success(`User with email ${email} online now.`)
-    })
+    this.hubConnection.on("UserOnline", email => {
+      this.toastService.success(`${email} is online now.`);
+    });
 
-      this.hubConnection.on("UserOffline", email=> {
-      this.toastService.success(`User with email ${email} offline now.`)
-    })
+    this.hubConnection.on("UserOffline", email => {
+      this.toastService.success(`${email} is offline now.`);
+    });
   }
 
   stopHubConnection() {
@@ -39,7 +37,9 @@ export class PresenceService {
     }
   }
 
-  get isHubConnectionStateIsConnected() {
-    return this.hubConnection?.state===HubConnectionState.Connected
+  get isHubConnectionActive() {
+    return this.hubConnection?.state === HubConnectionState.Connected
+        || this.hubConnection?.state === HubConnectionState.Connecting
+        || this.hubConnection?.state === HubConnectionState.Reconnecting;
   }
 }
