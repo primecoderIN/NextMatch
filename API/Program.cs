@@ -160,6 +160,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddSignalR(); //Added signal r as service
+builder.Services.AddSingleton<PresenceTracker>(); //Add presence tracker as singleton so it does not destroy
 
 var app = builder.Build();
 
