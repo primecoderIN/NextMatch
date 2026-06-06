@@ -159,7 +159,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddSignalR(); //Added signal r as service
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.Converters.Add(new UtcDateTimeConverter());
+    }); //Added signal r as service with consistent UTC date formatting
 builder.Services.AddSingleton<PresenceTracker>(); //Add presence tracker as singleton so it does not destroy
 
 
