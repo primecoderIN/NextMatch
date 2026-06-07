@@ -71,7 +71,7 @@ This repository contains a full-stack dating application built with a .NET backe
 
 ## 📄 License
 
-This project is provided as-is without any specific license. Add an appropriate license file if needed.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ---
 
