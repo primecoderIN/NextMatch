@@ -10,10 +10,11 @@ namespace API.SignalR;
     public override async Task OnConnectedAsync() //Things we want to do when user connects to hub goes here
     {
         //Add the connected user to in memory thread safe dictionary
-       await presenceTracker.UserConnected(GetUserId(), Context.ConnectionId);
+       var isOnline = await presenceTracker.UserConnected(GetUserId(), Context.ConnectionId);
 
        //Inform others that a new user is connected
-       await Clients.Others.SendAsync("UserOnline", GetUserId());
+       if (isOnline)
+           await Clients.Others.SendAsync("UserOnline", GetUserId());
 
        var currentOnlineUsers = await presenceTracker.GetOnlineUsers();
        //Sent list of all online users to all the connected users 
@@ -23,9 +24,11 @@ namespace API.SignalR;
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         //Remove the disconnected user from in memory thread safe dictionary
-        await presenceTracker.UserDisconnected(GetUserId(), Context.ConnectionId);
+        var isOffline = await presenceTracker.UserDisconnected(GetUserId(), Context.ConnectionId);
+        
         //Send user id of disconnected user to all other users
-        await Clients.Others.SendAsync("UserOffline", GetUserId());
+        if (isOffline)
+            await Clients.Others.SendAsync("UserOffline", GetUserId());
 
         await base.OnDisconnectedAsync(exception);
     }

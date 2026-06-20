@@ -7,26 +7,41 @@ public class PresenceTracker
     //  thread-safe in-memory data structure that can be safely accessed by multiple requests/threads simultaneously
     private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string,byte>> OnlineUsers = new();
 
-    public Task UserConnected(string userId, string connectionId)
+    public Task<bool> UserConnected(string userId, string connectionId)
     {
+        bool isOnline = false;
         var connections = OnlineUsers.GetOrAdd(userId, _=> new ConcurrentDictionary<string, byte>());
-        connections.TryAdd(connectionId,0);
-        return Task.CompletedTask;
+
+        lock(connections)
+        {
+            connections.TryAdd(connectionId,0);
+            if (connections.Count == 1)
+            {
+                isOnline = true;
+            }
+        }
+
+        return Task.FromResult(isOnline);
     }
 
-    public Task UserDisconnected(string userId,string connectionId)
+    public Task<bool> UserDisconnected(string userId,string connectionId)
     {
+        bool isOffline = false;
         //if userId exists in onlineUsers dictionary then store that in connections to use
         if(OnlineUsers.TryGetValue(userId, out var connections))
         {
-            connections.TryRemove(connectionId, out _);
-
-            if(connections.IsEmpty)
+            lock(connections)
             {
-                OnlineUsers.TryRemove(userId, out _);
+                connections.TryRemove(connectionId, out _);
+
+                if(connections.IsEmpty)
+                {
+                    OnlineUsers.TryRemove(userId, out _);
+                    isOffline = true;
+                }
             }
         }
-        return Task.CompletedTask;
+        return Task.FromResult(isOffline);
     }
 
     public Task<string[]> GetOnlineUsers()
