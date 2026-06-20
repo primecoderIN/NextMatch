@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()
+            .AllowCredentials() //Suppots signal r to send access token
             .WithOrigins("http://localhost:4200", "https://localhost:4200");
     });
 });
@@ -88,7 +88,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //Thi
             ClockSkew = TimeSpan.Zero //This property is used to specify the amount of time that the token validation process should allow for clock skew when validating the expiration time of a JWT token. By setting this property to TimeSpan.Zero, we are effectively disabling any allowance for clock skew, which means that the token will be considered expired immediately after its expiration time has passed. This can enhance security by ensuring that expired tokens are not accepted, but it also means that there is no grace period for potential discrepancies in system clocks between the token issuer and the token validator.
         };
 
-        options.Events = new JwtBearerEvents 
+        options.Events = new JwtBearerEvents  //Getting access tokens from signal r requests from client
         {
             OnMessageReceived = context =>
             {
