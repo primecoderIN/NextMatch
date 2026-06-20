@@ -14,6 +14,13 @@ namespace API.Interfaces
 
         Task<IReadOnlyList<MessageDTO>> GetMessageThread(string currentMemberId, string recipientMemberId);
 
+        /// <summary>
+        /// Returns a page of messages (newest first, then reversed for display) and a hasMore flag.
+        /// Marks unread messages as read only on pageNumber == 1.
+        /// </summary>
+        Task<(IReadOnlyList<MessageDTO> Messages, bool HasMore)> GetMessageThreadPaged(
+            string currentMemberId, string otherMemberId, int pageNumber, int pageSize);
+
         Task<bool> SaveAllAsync();
     }
 }

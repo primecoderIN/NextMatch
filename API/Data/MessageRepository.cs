@@ -77,8 +77,41 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         .ToListAsync();
     }
 
+    public async Task<(IReadOnlyList<MessageDTO> Messages, bool HasMore)> GetMessageThreadPaged(
+        string currentMemberId, string otherMemberId, int pageNumber, int pageSize)
+    {
+        // Mark unread messages as read on first page load only
+        if (pageNumber == 1)
+        {
+            await context.Messages
+                .Where(x => x.RecipientId == currentMemberId && x.SenderId == otherMemberId && x.DateRead == null)
+                .ExecuteUpdateAsync(x => x.SetProperty(m => m.DateRead, DateTime.UtcNow));
+        }
+
+        var query = context.Messages
+            .Where(x =>
+                (x.RecipientId == currentMemberId && x.SenderId == otherMemberId && !x.RecipientDeleted) ||
+                (x.SenderId == currentMemberId && x.RecipientId == otherMemberId && !x.SenderDeleted))
+            .OrderByDescending(x => x.MessageSent); // newest first for pagination
+
+        var totalCount = await query.CountAsync();
+        var hasMore = totalCount > pageNumber * pageSize;
+
+        var messages = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(MessageExtension.ToDTOProjection())
+            .ToListAsync();
+
+        // Reverse so oldest of this page appears at top (chronological order)
+        messages.Reverse();
+
+        return (messages, hasMore);
+    }
+
     public async Task<bool> SaveAllAsync()
     {
       return await context.SaveChangesAsync() > 0;
     }
 }
+

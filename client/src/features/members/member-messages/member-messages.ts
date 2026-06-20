@@ -1,13 +1,11 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { MessageService } from '../../../core/services/message-service';
-import { Message } from '../../../types/message';
 import { MemberService } from '../../../core/services/member-service';
 import { AccountService } from '../../../core/services/account-service';
 import { BusyService } from '../../../core/services/busy-service';
 import { TimeAgoPipe } from '../../../core/pipe/time-ago-pipe';
 import { Skeleton } from '../../../shared/skeleton/skeleton';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-member-messages',
@@ -15,7 +13,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './member-messages.html',
   styleUrl: './member-messages.css',
 })
-export class MemberMessages implements OnInit, OnDestroy {
+export class MemberMessages implements OnInit, AfterViewInit, OnDestroy {
   protected messageService = inject(MessageService);
   protected memberService = inject(MemberService);
   private accountService = inject(AccountService);
@@ -23,17 +21,50 @@ export class MemberMessages implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   protected newMessage = signal<string>('');
   protected currentUserId = signal<string | null>(null);
-  private routeSub?: Subscription;
+
+  @ViewChild('threadScroll') private threadScrollRef?: ElementRef<HTMLDivElement>;
+  private scrollListener?: () => void;
 
   ngOnInit(): void {
     this.currentUserId.set(this.accountService.currentUser()?.id || null);
 
-    // Read the :id param from the parent route (members/:id)
-    // Use take(1) equivalent by reading the snapshot directly — the id never
-    // changes while this child is active, and using snapshot avoids a leak.
     const otherUserId = this.route.parent?.snapshot.paramMap.get('id');
     if (otherUserId) {
       this.messageService.createHubConnection(otherUserId);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Attach scroll listener after view is rendered
+    const el = this.threadScrollRef?.nativeElement;
+    if (el) {
+      this.scrollListener = () => this.onScroll(el);
+      el.addEventListener('scroll', this.scrollListener);
+    }
+
+    // Register scroll-restore callback — fires AFTER ReceiveMoreMessages re-renders
+    this.messageService.onMoreMessagesReceived = () => {
+      const scrollEl = this.threadScrollRef?.nativeElement;
+      if (scrollEl && this._prevScrollHeight !== null) {
+        scrollEl.scrollTop = scrollEl.scrollHeight - this._prevScrollHeight;
+        this._prevScrollHeight = null;
+      }
+    };
+
+    // Register initial scroll-to-bottom callback — fires AFTER ReceiveMessageThread re-renders
+    this.messageService.onMessageThreadReceived = () => {
+      this.scrollToBottom();
+    };
+  }
+
+  private _prevScrollHeight: number | null = null;
+
+  private onScroll(el: HTMLDivElement): void {
+    // When user scrolls within 60px of the top, load more (older) messages
+    if (el.scrollTop <= 60 && !this.messageService.isLoadingMore() && this.messageService.hasMoreMessages()) {
+      // Capture scroll height BEFORE new messages are prepended
+      this._prevScrollHeight = el.scrollHeight;
+      this.messageService.loadMoreMessages();
     }
   }
 
@@ -44,31 +75,26 @@ export class MemberMessages implements OnInit, OnDestroy {
     const other = this.memberService.member();
     if (!other) return;
 
-    // Clear the input immediately for responsiveness
     this.newMessage.set('');
 
-    // Let the server confirm via NewMessage SignalR event — no optimistic update needed
-    // since Clients.Group() on the server sends back to the sender too
     this.messageService.addMessageToThread(other.id, content)?.then(() => {
       setTimeout(() => this.scrollToBottom(), 30);
     }).catch(err => {
       console.error('Failed to send message:', err);
-      // Restore message text if send fails
       this.newMessage.set(content);
     });
   }
 
-  private scrollToBottom() {
-    try {
-      const el = document.getElementById('threadScroll');
-      if (el) el.scrollTop = el.scrollHeight;
-    } catch (e) {
-      // ignore
-    }
+  scrollToBottom() {
+    const el = this.threadScrollRef?.nativeElement;
+    if (el) el.scrollTop = el.scrollHeight;
   }
 
   ngOnDestroy(): void {
-    this.routeSub?.unsubscribe();
+    const el = this.threadScrollRef?.nativeElement;
+    if (el && this.scrollListener) {
+      el.removeEventListener('scroll', this.scrollListener);
+    }
     this.messageService.stopHubConnection();
   }
 }
