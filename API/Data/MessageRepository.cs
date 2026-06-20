@@ -68,11 +68,11 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
 
     public async Task<IReadOnlyList<MessageDTO>> GetMessageThread(string currentMemberId, string senderMemberId)
     {
-        await context.Messages.Where(x=> x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.DateRead==null)
-        .ExecuteUpdateAsync(x=> x.SetProperty(m=> m.DateRead, DateTime.UtcNow));
+        await context.Messages.Where(x=>x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.DateRead==null)
+        .ExecuteUpdateAsync(x=>x.SetProperty(m=>m.DateRead, DateTime.UtcNow));
 
-        return await context.Messages.Where(x=> (x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.RecipientDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.SenderDeleted==false))
-        .OrderBy(x=> x.MessageSent)
+        return await context.Messages.Where(x=>(x.RecipientId==currentMemberId && x.SenderId==senderMemberId && x.RecipientDeleted==false) || (x.SenderId==currentMemberId && x.RecipientId ==senderMemberId && x.SenderDeleted==false))
+        .OrderBy(x=>x.MessageSent)
         .Select(MessageExtension.ToDTOProjection())
         .ToListAsync();
     }
@@ -134,5 +134,24 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
             .Select(x => x.SenderId)
             .Distinct()
             .CountAsync();
+    }
+
+    public async Task<IReadOnlyList<string>> MarkMessagesAsReadAsync(IEnumerable<string> messageIds, string recipientId)
+    {
+        var messageIdList = messageIds.ToList();
+
+        var messages = await context.Messages
+            .Where(x => messageIdList.Contains(x.Id) && x.RecipientId == recipientId && x.DateRead == null)
+            .ToListAsync();
+
+        if (messages.Count == 0) return [];
+
+        var readAt = DateTime.UtcNow;
+        foreach (var msg in messages)
+            msg.DateRead = readAt;
+
+        await context.SaveChangesAsync();
+
+        return messages.Select(m => m.Id).ToList();
     }
 }

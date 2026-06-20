@@ -79,6 +79,31 @@ public class MessageHub(IMessageRepository messageRepository, IMemberRepository 
         return base.OnDisconnectedAsync(exception);
     }
 
+    /// <summary>
+    /// Called by the recipient client when a new live message arrives while they are actively viewing the thread.
+    /// Marks those messages as read in the DB and notifies the sender via MessagesRead.
+    /// </summary>
+    public async Task MarkMessagesRead(List<string> messageIds)
+    {
+        var currentUserId = GetUserId();
+        var readIds = await messageRepository.MarkMessagesAsReadAsync(messageIds, currentUserId);
+
+        if (readIds.Count > 0)
+        {
+            // We need the sender id — infer from the first message's group context
+            // Broadcast to everyone else in the group (i.e., the sender)
+            // The group name is the same one we joined in OnConnectedAsync
+            var httpContext = Context.GetHttpContext();
+            var otherUserId = httpContext?.Request.Query["userId"].ToString();
+            if (!string.IsNullOrEmpty(otherUserId))
+            {
+                var groupName = GetGroupName(currentUserId, otherUserId);
+                await Clients.OthersInGroup(groupName).SendAsync("MessagesRead", readIds);
+            }
+        }
+    }
+
+
     private static string GetGroupName(string? caller, string? otherUserId)
     {
         var stringCompare = string.CompareOrdinal(caller, otherUserId) < 0;

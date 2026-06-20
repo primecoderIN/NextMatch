@@ -79,8 +79,12 @@ export class MessageService {
         ...messages,
         { ...message, currentUserSender: message.senderId === currentUserId }
       ]);
-      // A new incoming message means unread count may have changed
+
       if (message.senderId !== currentUserId) {
+        // Recipient is actively viewing — immediately mark as read
+        this.hubConnection?.invoke("MarkMessagesRead", [message.id])
+          .catch(err => console.error('MarkMessagesRead error:', err));
+        // Refresh nav badge
         this.loadUnreadCount();
       }
     });

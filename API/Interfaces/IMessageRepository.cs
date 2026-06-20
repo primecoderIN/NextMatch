@@ -26,6 +26,11 @@ namespace API.Interfaces
         /// </summary>
         Task<int> GetUnreadMessageCount(string memberId);
 
+        /// <summary>
+        /// Marks the given message IDs as read (only if recipient matches) and returns the IDs that were updated.
+        /// </summary>
+        Task<IReadOnlyList<string>> MarkMessagesAsReadAsync(IEnumerable<string> messageIds, string recipientId);
+
         Task<bool> SaveAllAsync();
     }
 }
