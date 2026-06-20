@@ -7,6 +7,7 @@ import { ToastService } from '../../core/services/toast-service';
 import { BusyService } from '../../core/services/busy-service';
 import { BarLoader } from '../../shared/bar-loader/bar-loader';
 import { HasRoleDirective } from '../../core/directives/has-role.directive';
+import { MessageService } from '../../core/services/message-service';
 
 @Component({
   selector: 'app-nav',
@@ -16,6 +17,7 @@ import { HasRoleDirective } from '../../core/directives/has-role.directive';
 })
 export class Nav {
   protected accountService = inject(AccountService);
+  protected messageService = inject(MessageService);
   protected credentials: LoginCredentials = { email: '', password: '' };
   protected routerService = inject(Router);
   protected toastService = inject(ToastService);

@@ -8,6 +8,7 @@ import { MemberService } from './member-service';
 import { clearHttpCache } from '../interceptors/loading-interceptor';
 import { jwtDecode } from 'jwt-decode';
 import { PresenceService } from './presence-service';
+import { MessageService } from './message-service';
 
 type DecodedToken = {
   role?: string | string[];
@@ -23,6 +24,7 @@ export class AccountService {
   private likeService = inject(LikesService);
   private memberService = inject(MemberService);
   private presenceService = inject(PresenceService);
+  private messageService = inject(MessageService);
   currentUser = signal<User | null>(null);
 
   private baseUrl = environment.apiUrl;
@@ -79,6 +81,7 @@ export class AccountService {
     this.currentUser.set(userWithRoles);
     try { localStorage.setItem('isLoggedIn', 'true'); } catch {}
     this.likeService.getLikeIds();
+    this.messageService.loadUnreadCount();
 
     // Only create a new hub connection if one isn't already active
     if (!this.presenceService.isHubConnectionActive) {
@@ -102,6 +105,7 @@ export class AccountService {
     this.currentUser.set(null);
     this.memberService.clearMemberData();
     this.likeService.clearLikeIds();
+    this.messageService.unreadCount.set(0);
     this.presenceService.stopHubConnection();
     clearHttpCache();
   }

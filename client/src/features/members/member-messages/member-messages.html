@@ -41,12 +41,33 @@
             <div class="message-row self-end flex items-end justify-end gap-3 my-3">
               <div class="message-bubble bg-indigo-600 text-white max-w-[70%] p-3 rounded-lg rounded-br-none shadow-sm">
                 <p class="whitespace-pre-wrap text-sm">{{ message.content }}</p>
-                @if (message.messageSent) {
-                  <div class="text-[11px] mt-2 text-white/80 text-right">{{ message.messageSent | timeAgo }}</div>
-                }
+                <div class="flex items-center justify-end gap-1.5 mt-2">
+                  @if (message.messageSent) {
+                    <span class="text-[11px] text-white/70">{{ message.messageSent | timeAgo }}</span>
+                  }
+                  @if (message.dateRead) {
+                    <span class="flex items-center gap-0.5 text-[11px] font-medium text-teal-300" title="Read">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 -ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      Read
+                    </span>
+                  } @else {
+                    <span class="flex items-center gap-0.5 text-[11px] text-white/50" title="Sent">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      Sent
+                    </span>
+                  }
+                </div>
               </div>
               <img [src]="message.senderImageUrl || '/user.png'" [alt]="message.senderUsername" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200" />
             </div>
+
           } @else {
             <!-- Received message (left side) -->
             <div class="message-row self-start flex items-start gap-3 my-3">

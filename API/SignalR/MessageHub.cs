@@ -22,15 +22,21 @@ public class MessageHub(IMessageRepository messageRepository, IMemberRepository 
         var groupName = GetGroupName(GetUserId(), otherUserId);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-        // Send first page only (most recent 20 messages)
-        var (messages, hasMore) = await messageRepository.GetMessageThreadPaged(GetUserId(), otherUserId, 1, PageSize);
+        // Send first page only (most recent messages); also marks unread messages as read
+        var (messages, hasMore, newlyReadIds) = await messageRepository.GetMessageThreadPaged(GetUserId(), otherUserId, 1, PageSize);
         await Clients.Caller.SendAsync("ReceiveMessageThread", messages, hasMore);
+
+        // If any messages were just marked as read, notify the sender so they can show read receipts
+        if (newlyReadIds.Count > 0)
+        {
+            await Clients.OthersInGroup(groupName).SendAsync("MessagesRead", newlyReadIds);
+        }
     }
 
     /// <summary>Called by the client when user scrolls to top to load older messages.</summary>
     public async Task LoadMoreMessages(string otherUserId, int pageNumber)
     {
-        var (messages, hasMore) = await messageRepository.GetMessageThreadPaged(
+        var (messages, hasMore, _) = await messageRepository.GetMessageThreadPaged(
             GetUserId(), otherUserId, pageNumber, PageSize);
 
         await Clients.Caller.SendAsync("ReceiveMoreMessages", messages, hasMore);

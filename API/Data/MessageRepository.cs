@@ -77,15 +77,28 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         .ToListAsync();
     }
 
-    public async Task<(IReadOnlyList<MessageDTO> Messages, bool HasMore)> GetMessageThreadPaged(
+    public async Task<(IReadOnlyList<MessageDTO> Messages, bool HasMore, IReadOnlyList<string> NewlyReadIds)> GetMessageThreadPaged(
         string currentMemberId, string otherMemberId, int pageNumber, int pageSize)
     {
+        var newlyReadIds = new List<string>();
+
         // Mark unread messages as read on first page load only
         if (pageNumber == 1)
         {
-            await context.Messages
+            var unreadMessages = await context.Messages
                 .Where(x => x.RecipientId == currentMemberId && x.SenderId == otherMemberId && x.DateRead == null)
-                .ExecuteUpdateAsync(x => x.SetProperty(m => m.DateRead, DateTime.UtcNow));
+                .ToListAsync();
+
+            if (unreadMessages.Count > 0)
+            {
+                var readAt = DateTime.UtcNow;
+                foreach (var msg in unreadMessages)
+                {
+                    msg.DateRead = readAt;
+                    newlyReadIds.Add(msg.Id);
+                }
+                await context.SaveChangesAsync();
+            }
         }
 
         var query = context.Messages
@@ -106,12 +119,20 @@ public class MessageRepository(AppDBContext context) : IMessageRepository
         // Reverse so oldest of this page appears at top (chronological order)
         messages.Reverse();
 
-        return (messages, hasMore);
+        return (messages, hasMore, newlyReadIds);
     }
 
     public async Task<bool> SaveAllAsync()
     {
       return await context.SaveChangesAsync() > 0;
     }
-}
 
+    public async Task<int> GetUnreadMessageCount(string memberId)
+    {
+        return await context.Messages
+            .Where(x => x.RecipientId == memberId && x.DateRead == null && !x.RecipientDeleted)
+            .Select(x => x.SenderId)
+            .Distinct()
+            .CountAsync();
+    }
+}

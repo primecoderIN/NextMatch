@@ -79,9 +79,15 @@
           >Matches</a
         >
         <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/lists" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white">Lists</a>
-        <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/messages" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
-          >Messages</a
-        >
+        <a routerLinkActive="bg-white/10 text-rose-300" routerLink="/messages" class="relative rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
+          >Messages
+          @if (messageService.unreadCount() > 0) {
+            <span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white shadow-md ring-2 ring-slate-950 animate-pulse">
+              {{ messageService.unreadCount() }}
+            </span>
+          }
+        </a>
+
         <a *appHasRole="['Admin']" routerLinkActive="bg-white/10 text-rose-300" routerLink="/admin" class="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white"
           >Admin</a
         >

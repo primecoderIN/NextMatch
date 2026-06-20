@@ -17,7 +17,7 @@ import { finalize } from 'rxjs';
   styleUrl: './messages.css',
 })
 export class Messages implements OnInit {
-  private messageService = inject(MessageService); 
+  protected messageService = inject(MessageService); 
   protected Container = 'Inbox';
   protected fetchedContainer = 'Inbox';
   protected pageNumber = 1;
@@ -41,6 +41,8 @@ export class Messages implements OnInit {
       next: (response) => {
         this.paginatedMessages.set(response);
         this.fetchedContainer = this.Container; // Update fetched container after successful load
+        // Refresh unread count whenever inbox is loaded
+        this.messageService.loadUnreadCount();
       },
       error: (error) => {
         console.error('Error fetching messages:', error);

@@ -50,6 +50,14 @@ public class MessagesController(IMessageRepository messageRepository, IMemberRep
         return await messageRepository.GetMessagesForMember(messageParams);
     }
 
+    [HttpGet("unread-count")]
+    public async Task<ActionResult<object>> GetUnreadMessageCount()
+    {
+        var memberId = User.GetMemberId();
+        var count = await messageRepository.GetUnreadMessageCount(memberId);
+        return Ok(new { count });
+    }
+
     [HttpGet("thread/{recipientId}")]
     public async Task<ActionResult<IReadOnlyList<MessageDTO>>> GetMessageThread(string recipientId)
     {

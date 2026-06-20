@@ -26,11 +26,12 @@ export class MemberMessages implements OnInit, AfterViewInit, OnDestroy {
   private scrollListener?: () => void;
 
   ngOnInit(): void {
-    this.currentUserId.set(this.accountService.currentUser()?.id || null);
+    const currentUser = this.accountService.currentUser();
+    this.currentUserId.set(currentUser?.id || null);
 
     const otherUserId = this.route.parent?.snapshot.paramMap.get('id');
-    if (otherUserId) {
-      this.messageService.createHubConnection(otherUserId);
+    if (otherUserId && currentUser) {
+      this.messageService.createHubConnection(otherUserId, currentUser.token, currentUser.id);
     }
   }
 

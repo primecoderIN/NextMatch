@@ -3,7 +3,6 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginatedResult } from '../../types/pagination';
 import { Message } from '../../types/message';
-import { AccountService } from './account-service';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 
 @Injectable({
@@ -13,13 +12,13 @@ export class MessageService {
   private baseUrl = environment.apiUrl + 'messages';
   private hubUrl = environment.hubUrl + "messages";
   private http = inject(HttpClient);
-  private accountService = inject(AccountService);
   private hubConnection?: HubConnection;
   private otherUserId?: string;
 
   mesageThread = signal<Message[]>([]);
   hasMoreMessages = signal<boolean>(false);
   isLoadingMore = signal<boolean>(false);
+  unreadCount = signal<number>(0);
   private currentPage = 1;
 
   /** Called right after older messages are prepended — use to restore scroll position */
@@ -28,19 +27,16 @@ export class MessageService {
   /** Called right after initial messages are loaded — use to scroll to bottom */
   onMessageThreadReceived?: () => void;
 
-  async createHubConnection(otherUserId: string) {
+  async createHubConnection(otherUserId: string, token: string, currentUserId: string) {
     // Await stop so we don't race the old connection closing
     await this.stopHubConnection();
-
-    const currentUser = this.accountService.currentUser();
-    if (!currentUser) return;
 
     this.otherUserId = otherUserId;
     this.currentPage = 1;
 
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.hubUrl + `?userId=${otherUserId}`, {
-        accessTokenFactory: () => currentUser.token
+        accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
       .build();
@@ -54,6 +50,8 @@ export class MessageService {
         currentUserSender: m.senderId !== otherUserId
       })));
       this.hasMoreMessages.set(hasMore);
+      // Reload unread count as messages were just marked as read
+      this.loadUnreadCount();
       // Fire scroll to bottom callback after Angular has re-rendered
       if (this.onMessageThreadReceived) {
         requestAnimationFrame(() => this.onMessageThreadReceived!());
@@ -79,8 +77,24 @@ export class MessageService {
     this.hubConnection.on("NewMessage", (message: Message) => {
       this.mesageThread.update(messages => [
         ...messages,
-        { ...message, currentUserSender: message.senderId === currentUser.id }
+        { ...message, currentUserSender: message.senderId === currentUserId }
       ]);
+      // A new incoming message means unread count may have changed
+      if (message.senderId !== currentUserId) {
+        this.loadUnreadCount();
+      }
+    });
+
+    // Real-time read receipts — the other user just read messages we sent
+    this.hubConnection.on("MessagesRead", (messageIds: string[]) => {
+      const readSet = new Set(messageIds);
+      this.mesageThread.update(messages =>
+        messages.map(m =>
+          readSet.has(m.id) && !m.dateRead
+            ? { ...m, dateRead: new Date().toISOString() }
+            : m
+        )
+      );
     });
   }
 
@@ -111,6 +125,13 @@ export class MessageService {
     this.otherUserId = undefined;
     this.onMoreMessagesReceived = undefined;
     this.onMessageThreadReceived = undefined;
+  }
+
+  loadUnreadCount() {
+    this.http.get<{ count: number }>(this.baseUrl + '/unread-count').subscribe({
+      next: (res) => this.unreadCount.set(res.count),
+      error: (err) => console.error('Failed to load unread count:', err),
+    });
   }
 
   getMessages(container: string, pageNumber: number, pageSize: number) {
